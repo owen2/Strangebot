@@ -1,0 +1,209 @@
+-----------------------------------------
+-- strangelove.lua						-
+-- Strategy Module for Dr. Strangebot	-
+-- by Owen Johnson						-
+-- http://owenjohnson.info/dev/defcon	-
+--										---------------------------------------------
+-- This contains all of the high level strategy for the agent. It's fancy....		-
+-- uses martin's coroutine wrapper. Thanks! see Multithreading.lua for more details	-
+-------------------------------------------------------------------------------------
+
+strangelove = {}
+
+
+-- Initial tick strategies based on defcon level.
+-- On first tick of each defcon level, function will spawn as a coroutine, at the end of the tick, the coroutine will be blocked.
+
+function strangelove.makeFriends() -- Overall strategy for stage 5
+	RequestAlliance(GetAllianceID(strangelove.getBestAlly()))
+end
+
+function strangelove.getBestAlly()
+	bestscore = -1
+	bestteam = nil
+	for i,team in ipairs(GetAllTeamIDs())
+	do
+		score = strangelove.allyUsefulness(team)
+		if (score > bestscore)
+			then bestscore, bestteam = score, team
+			DebugLog("Best ally so far is"..GetTeamName(team).." SCORE: "..score)
+		else
+			DebugLog(GetTeamName(team).." is not a good ally. SCORE: "..score)
+		end
+	end
+	return bestteam
+end
+
+function strangelove.allyUsefulness(team) -- return probability that ally will be useful
+	usefulness = 1.0
+	if (team == GetOwnTeamID()) -- Don't ask yourself for alliance
+		then DebugLog(GetTeamName(team).." is self") return 0 end
+	if (string.match(GetTeamName(team),"[CPU]")) -- Don't ask the original CPU player for alliance, it will ignore you.
+		then DebugLog(GetTeamName(team).." is cpu") return 0 end
+	if (not World.isMyNeighbor(team)) -- neighbors make for a good ally
+	then
+		DebugLog(GetTeamName(team).." is not a neighbor")
+		usefulness = .75 * usefulness end
+	usefulness = (World.numberOfAllies(team)+1) * usefulness-- Make biggest alliance highest priority
+	return usefulness
+end
+
+
+function strangelove.buildHiveByPopulationCenter()
+	NewThread(function()
+		if (placed ~= 1) then
+			baselong, baselat = World.GetOwnPopulationCenter()
+			Whiteboard.drawCircle(baselong, baselat, 10)
+			DebugLog("baselong, baselat: "..baselong..", "..baselat)
+			PlaceStructure(baselong, baselat, "RadarStation")
+			--[[PlaceStructure(baselong, baselat, "Silo")
+			Wait(true)
+			PlaceStructure(baselong + 5.1, baselat, "Silo")
+			Wait(true)
+			PlaceStructure(baselong - 5.1, baselat, "Silo")
+			Wait(true)
+			PlaceStructure(baselong, baselat + 5.1, "Silo")
+			Wait(true)
+			PlaceStructure(baselong, baselat - 5.1, "Silo")
+			Wait(true)]]--
+			strangelove.buildRing(baselong, baselat, 10, "Silo")
+			strangelove.buildStuffRandom() -- Build the stuff we forgot.
+		end
+	end)
+
+end
+
+
+
+function strangelove.buildStuffRandom()
+	-- TODO: Make strategy for placing land and sea units. For now, is random.
+	--myCities = World.GetOwnCities()
+	--myCities = World.popsort(myCities)
+	--for i=1,12 do
+	if (placed ~= 1) then
+		if GetRemainingUnits("Silo") > 0 then
+			DebugLog(GetRemainingUnits("Silo").." silos left")
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+				--long, lat = GetLongitude(myCities[i]), GetLatitude(myCities[i])
+			until (IsValidPlacementLocation(long, lat, "Silo"))
+				PlaceStructure(long, lat, "Silo")
+		end
+		if GetRemainingUnits("RadarStation") > 0 then
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+			until (IsValidPlacementLocation(long, lat, "RadarStation"))
+				PlaceStructure(long, lat, "RadarStation")
+		end
+		if GetRemainingUnits("AirBase") > 0 then
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+			until (IsValidPlacementLocation(long, lat, "AirBase"))
+				PlaceStructure(long, lat, "AirBase")
+		end
+		if GetRemainingUnits("BattleShip") > 0 then
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+			until IsValidPlacementLocation(long, lat, "BattleShip")
+				PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
+		elseif GetRemainingUnits("Carrier") > 0 then
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+			until IsValidPlacementLocation(long, lat, "Carrier")
+				PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
+		elseif GetRemainingUnits("Sub") > 0 then
+			repeat
+				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
+			until IsValidPlacementLocation(long, lat, "Sub")
+				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+		else
+			strangelove.moveBoats()
+			placed= 1
+		end
+	end
+end
+
+function strangelove.nukepanic()
+	silos = World.Get("my silos with nukes")
+	for _, silo in ipairs(silos) do
+		silo:SetState(0)
+			target = targetCities[j % # targetCities]
+			j=j+1
+			silo:SetActionTarget(target)
+	end
+	subs = World.Get("my subs with nukes")
+	for _, sub in ipairs(subs) do
+		--long, lat = sub:GetMovementTargetLocation()
+		--DebugLog("boat en route to: "..long)
+		--long2, lat2 = sub:GetLongitude(), sub:GetLatitude()
+		--if GetSailDistance(long, lat, long2, lat2) < 10 then
+		sub:SetState(2)
+		target = targetCities[j % # targetCities]
+		j=j+1
+		sub:SetActionTarget(target)
+		--end
+	end
+	airbases = World.Get("my airbases with nukes")
+	for _,base in ipairs(airbases) do
+		base:SetState(1)
+		target = targetCities[j % # targetCities]
+		j=j+1
+		base:SetActionTarget(target)
+		DebugLog("Told airbase to launch.")
+	end
+	airbases = World.Get("my carriers with nukes")
+	for _,base in ipairs(airbases) do
+		base:SetState(1)
+		target = targetCities[j % # targetCities]
+		j=j+1
+		base:SetActionTarget(target)
+		DebugLog("Told airbase to launch.")
+	end
+end
+
+function strangelove.moveBoats()
+	units = World.Get("my subs")
+	for _, unit in ipairs(units) do
+		x, y = World.GetNearestEnemyCoast(unit:GetLongitude(),unit:GetLatitude())
+		unit:SetMovementTarget(x,y)
+	end
+end
+
+function strangelove.scoutTargets()
+
+end
+
+function strangelove.endGame()
+
+end
+
+function strangelove.buildFleet(x, y, radius, unitType)
+
+		local theta_step = math.pi * 2 / 6
+		local sin1, cos1 = math.sin(theta_step), math.cos(theta_step)
+		local dx = 5.1
+		local dy = 0
+		for i = 1, 6 do
+			local nx = cos1 * dx - sin1 * dy
+			local ny = sin1 * dx + cos1 * dy
+			PlaceFleet(x+nx, y+ny, unitType)
+			--Wait(true)
+			dx, dy = nx, ny
+		end
+end
+
+function strangelove.buildRing(x, y, radius, unitType)
+		local theta_step = math.pi * 2 / 6
+		local sin, cos = math.sin(theta_step), math.cos(theta_step)
+		local dx = 10
+		local dy = 0
+		for i = 1, 6 do
+			local nx = cos * dx - sin * dy
+			local ny = sin * dx + cos * dy
+			PlaceStructure(x + nx, y + ny, unitType)
+			Wait(true)
+			--WhiteboardDraw(x + dx, y + dy, x + nx, y + ny)
+			dx, dy = nx, ny
+		end
+
+end
