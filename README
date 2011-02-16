@@ -3,4 +3,10 @@ by Owen Johnson
 owen@owenjohnson.info
 
 You need to rename the folder these files are in to strangebot and place it in the AI folder of defcon.
+You may also rename the .dll and the folder so they match if you want to rename the bot you built based on this one.
 
+Uses Martin's multithreadding and someone's whiteboard library
+
+License
+
+CC-by-nc

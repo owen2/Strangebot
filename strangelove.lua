@@ -53,7 +53,7 @@ function strangelove.buildHiveByPopulationCenter()
 	NewThread(function()
 		if (placed ~= 1) then
 			baselong, baselat = World.GetOwnPopulationCenter()
-			Whiteboard.drawCircle(baselong, baselat, 10)
+			Whiteboard.drawCircle(baselong, baselat, 5)
 			DebugLog("baselong, baselat: "..baselong..", "..baselat)
 			PlaceStructure(baselong, baselat, "RadarStation")
 			--[[PlaceStructure(baselong, baselat, "Silo")
@@ -66,7 +66,7 @@ function strangelove.buildHiveByPopulationCenter()
 			Wait(true)
 			PlaceStructure(baselong, baselat - 5.1, "Silo")
 			Wait(true)]]--
-			strangelove.buildRing(baselong, baselat, 10, "Silo")
+			strangelove.buildRing(baselong, baselat, 5.1, "Silo")
 			strangelove.buildStuffRandom() -- Build the stuff we forgot.
 		end
 	end)
@@ -105,17 +105,20 @@ function strangelove.buildStuffRandom()
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "BattleShip")
-				PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
+				--PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
+				strangelove.buildFleet(long, lat, 10, "BattleShip")
 		elseif GetRemainingUnits("Carrier") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Carrier")
-				PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
+				--PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
+				strangelove.buildFleet(long, lat,10 ,  "Carrier")
 		elseif GetRemainingUnits("Sub") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Sub")
-				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+				--PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+				strangelove.buildFleet(long, lat,10, "Sub")
 		else
 			strangelove.moveBoats()
 			placed= 1
@@ -124,48 +127,52 @@ function strangelove.buildStuffRandom()
 end
 
 function strangelove.nukepanic()
-	silos = World.Get("my silos with nukes")
-	for _, silo in ipairs(silos) do
-		silo:SetState(0)
+	if GetGameTick() % 10 == 0 then
+		silos = World.Get("my silos with nukes")
+		for _, silo in ipairs(silos) do
+			silo:SetState(0)
+				target = targetCities[j % # targetCities]
+				j=j+1
+				silo:SetActionTarget(target)
+		end
+		subs = World.Get("my subs with nukes")
+		for _, sub in ipairs(subs) do
+			clong, clat = sub:GetLongitude(), sub:GetLatitude()
+			tlong, tlat = World.GetNearestEnemyCoast(clong, clat)
+			DebugLog(clong.." "..clat.." "..tlong.." "..tlat)
+			if GetSailDistance(clong, clat, tlong, tlat) < 20 then
+				sub:SetState(2)
+				target = targetCities[j % # targetCities]
+				j=j+1
+				sub:SetActionTarget(target)
+			else
+				sub:SetMovementTarget(tlong, tlat)
+			end
+		end
+		airbases = World.Get("my airbases with nukes")
+		for _,base in ipairs(airbases) do
+			base:SetState(1)
 			target = targetCities[j % # targetCities]
 			j=j+1
-			silo:SetActionTarget(target)
-	end
-	subs = World.Get("my subs with nukes")
-	for _, sub in ipairs(subs) do
-		--long, lat = sub:GetMovementTargetLocation()
-		--DebugLog("boat en route to: "..long)
-		--long2, lat2 = sub:GetLongitude(), sub:GetLatitude()
-		--if GetSailDistance(long, lat, long2, lat2) < 10 then
-		sub:SetState(2)
-		target = targetCities[j % # targetCities]
-		j=j+1
-		sub:SetActionTarget(target)
-		--end
-	end
-	airbases = World.Get("my airbases with nukes")
-	for _,base in ipairs(airbases) do
-		base:SetState(1)
-		target = targetCities[j % # targetCities]
-		j=j+1
-		base:SetActionTarget(target)
-		DebugLog("Told airbase to launch.")
-	end
-	airbases = World.Get("my carriers with nukes")
-	for _,base in ipairs(airbases) do
-		base:SetState(1)
-		target = targetCities[j % # targetCities]
-		j=j+1
-		base:SetActionTarget(target)
-		DebugLog("Told airbase to launch.")
+			base:SetActionTarget(target)
+			DebugLog("Told airbase to launch.")
+		end
+		airbases = World.Get("my carriers with nukes")
+		for _,base in ipairs(airbases) do
+			base:SetState(1)
+			target = targetCities[j % # targetCities]
+			j=j+1
+			base:SetActionTarget(target)
+			DebugLog("Told airbase to launch.")
+		end
 	end
 end
 
 function strangelove.moveBoats()
-	units = World.Get("my subs")
+	units = World.Get("my sea units")
 	for _, unit in ipairs(units) do
 		x, y = World.GetNearestEnemyCoast(unit:GetLongitude(),unit:GetLatitude())
-		unit:SetMovementTarget(x,y)
+		unit:SetMovementTarget(x + ((math.random() * 10) - 5),y + ((math.random() * 10) - 5))
 	end
 end
 
@@ -181,13 +188,13 @@ function strangelove.buildFleet(x, y, radius, unitType)
 
 		local theta_step = math.pi * 2 / 6
 		local sin1, cos1 = math.sin(theta_step), math.cos(theta_step)
-		local dx = 5.1
+		local dx = radius
 		local dy = 0
 		for i = 1, 6 do
 			local nx = cos1 * dx - sin1 * dy
 			local ny = sin1 * dx + cos1 * dy
 			PlaceFleet(x+nx, y+ny, unitType)
-			--Wait(true)
+			Wait(true)
 			dx, dy = nx, ny
 		end
 end
@@ -195,7 +202,7 @@ end
 function strangelove.buildRing(x, y, radius, unitType)
 		local theta_step = math.pi * 2 / 6
 		local sin, cos = math.sin(theta_step), math.cos(theta_step)
-		local dx = 10
+		local dx = radius
 		local dy = 0
 		for i = 1, 6 do
 			local nx = cos * dx - sin * dy

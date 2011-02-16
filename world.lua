@@ -154,7 +154,7 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	d = GetSailDistance(x,y, 175, 55)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
-	return bestlong + ((math.random() * 10) - 5), bestlat + ((math.random() * 10) - 5)
+	return bestlong, bestlat
 	--return bestlong, bestlat
 
 end
@@ -191,6 +191,11 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 	else
 		units = GetAllUnits()
 	end
+
+	if string.match(query, "fleet") then
+		units = GetOwnFleets()
+	end
+
 	-- filter by unit type land, sea, air, Silo, AirBase, RadarStation, BattleShip, Carrier, Sub, Fighter, Bomber, Nuke -- only one of these should be used.
 	if string.match(query, "land") then
 		landunits = {}

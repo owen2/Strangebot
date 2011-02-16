@@ -15,22 +15,22 @@ package.path = debug.getinfo(1, "S").source:match[[^@?(.*[\/])[^\/]-$]] .."?.lua
 require "Whiteboard" -- A library for easier Whiteboard drawing
 require "world" -- A perception model for the world to get info from
 require "strangelove" -- The higher level strategy code for the AI
-require "Multithreading"
---require "coords" -- A predefined list of places to send your boats.
+require "Multithreading" -- A coroutine queuing library
+require "graph" -- A graph library
 
 ---------------------------------
 -- Some Global Variables here.	-
 ---------------------------------
-DefconLevel = 0
-j = 0
-targetCities = {}
-placed = 0
+DefconLevel = 0 -- the stage of the game
+j = 0 -- a global index for next target in target list
+targetCities = {} -- A list of target cities
+placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running
+--map = Graph.readgraph("AI\strangebot\world.graph") -- Created a graph of connected territories and oceans
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
-	SendChat("/name [BOT]Dr. Strangebot")
-	SendChat("Hi, I'm a bot!")
-	SendChat("See http://owenjohnson.info/dev/defcon for more info.")
+	SendChat("/name [BOT]Strangebot")
+	SendChat("Hi, I'm Owen's bot! See owenjohnson.info for more info.")
 end
 
 -- Also required. 100ms execution time limit. Use it well.

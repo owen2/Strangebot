@@ -53,9 +53,10 @@ function Graph.printpath(path)
 		print(path[i].name)
 	end
 end
-
+--[[ test code
 world = Graph.readgraph("world.graph")
 na = Graph.getNodeByName(world, "NorthAmerica")
 ru = Graph.getNodeByName(world, "Russia")
 path = Graph.findPath(na, ru)
 Graph.printpath(path)
+]]--
