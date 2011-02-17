@@ -106,19 +106,19 @@ function strangelove.buildStuffRandom()
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "BattleShip")
 				--PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
-				strangelove.buildFleet(long, lat, 10, "BattleShip")
+				strangelove.buildFleet(long, lat, 3, "BattleShip")
 		elseif GetRemainingUnits("Carrier") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Carrier")
 				--PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
-				strangelove.buildFleet(long, lat,10 ,  "Carrier")
+				strangelove.buildFleet(long, lat,3 ,  "Carrier")
 		elseif GetRemainingUnits("Sub") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Sub")
 				--PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
-				strangelove.buildFleet(long, lat,10, "Sub")
+				strangelove.buildFleet(long, lat,3, "Sub")
 		else
 			strangelove.moveBoats()
 			placed= 1
@@ -127,11 +127,13 @@ function strangelove.buildStuffRandom()
 end
 
 function strangelove.nukepanic()
+	local targets = World.GetTargetCities()
 	if GetGameTick() % 10 == 0 then
 		silos = World.Get("my silos with nukes")
 		for _, silo in ipairs(silos) do
 			silo:SetState(0)
-				target = targetCities[j % # targetCities]
+				World.proxsort(targets, silo:GetLongitude(), silo:GetLatitude())
+				target = targets[j % # targets]
 				j=j+1
 				silo:SetActionTarget(target)
 		end
@@ -139,10 +141,10 @@ function strangelove.nukepanic()
 		for _, sub in ipairs(subs) do
 			clong, clat = sub:GetLongitude(), sub:GetLatitude()
 			tlong, tlat = World.GetNearestEnemyCoast(clong, clat)
-			DebugLog(clong.." "..clat.." "..tlong.." "..tlat)
-			if GetSailDistance(clong, clat, tlong, tlat) < 20 then
+			--DebugLog(clong.." "..clat.." "..tlong.." "..tlat)
+			if GetDistance(clong, clat, tlong, tlat) < 20 then
 				sub:SetState(2)
-				target = targetCities[j % # targetCities]
+				target = targets[j % # targets]
 				j=j+1
 				sub:SetActionTarget(target)
 			else
@@ -150,27 +152,31 @@ function strangelove.nukepanic()
 			end
 		end
 		airbases = World.Get("my airbases with nukes")
+		targets = World.Get("hostile land")
+
 		for _,base in ipairs(airbases) do
+			World.proxsort(targets, base:GetLongitude(), base:GetLatitude())
 			base:SetState(1)
-			target = targetCities[j % # targetCities]
+			target = targets[j % # targets]
 			j=j+1
 			base:SetActionTarget(target)
-			DebugLog("Told airbase to launch.")
+			--DebugLog("Told airbase to launch.")
 		end
 		airbases = World.Get("my carriers with nukes")
 		for _,base in ipairs(airbases) do
+			World.proxsort(targets, base:GetLongitude(), base:GetLatitude())
 			base:SetState(1)
-			target = targetCities[j % # targetCities]
+			target = targets[j % # targets]
 			j=j+1
 			base:SetActionTarget(target)
-			DebugLog("Told airbase to launch.")
+			--DebugLog("Told airbase to launch.")
 		end
 	end
 end
 
 function strangelove.moveBoats()
 	local scoremode = GetOptionValue("ScoreMode")
-	if scoremode == 1 then
+	if scoremode == 1 or string.match("NorthAmerica SouthAmerica Africa",World.territoryOf(GetOwnTeamID())) then
 		strangelove.moveBoatsDefensive()
 	else
 		strangelove.moveBoatsAgressive()

@@ -48,7 +48,12 @@ function World.GetTargetCities()
 			table.insert(badCities, city)
 		end
 	end
+	for _,v in ipairs(World.Get("hostile land")) do table.insert(badCities, v) end
 	return badCities
+end
+
+function World.proxsort(targs, long, lat)
+	table.sort(targs, function(a, b) return GetDistance(long, lat, a:GetLongitude(), a:GetLatitude()) < GetDistance(long, lat, b:GetLongitude(), b:GetLatitude())end)
 end
 
 function World.popsort(cityList)
@@ -67,11 +72,14 @@ end
 function World.isEnemyTerritory(ter)
 	team = World.whoIs(ter)
 	if not team then return false end
-	return World.isEnemyTeam(team)
+	return not World.isFriendlyTeam(team)
 end
 
-function World.isEnemyTeam(teamID)
-	return not World.isFriendlyTeam(teamID)
+function World.isEnemy(unit)
+	hometeam = GetOwnTeamID()
+	friendly = GetAllianceID(hometeam)
+	unitTeam = GetTeamID(unit)
+	return (hometeam ~= unitTeam and friendly ~= GetAllianceID(unitTeam)) -- it's not ours, it's not our friend's, LET'S NUKE IT!
 end
 
 function World.isMyNeighbor(teamID)
@@ -152,14 +160,13 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = 60, 0, d end
 	d = GetSailDistance(x,y, 90,0 )
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 90, 0, d end
-	d = GetSailDistance(x,y, 140, 10)
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 140, 10, d end
+	d = GetSailDistance(x,y, 135, 20)
+	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 135, 20, d end
 	d = GetSailDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	d = GetSailDistance(x,y, 175, 55)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
 	return bestlong, bestlat
-	--return bestlong, bestlat
 
 end
 
@@ -173,21 +180,18 @@ end
 
 
 function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
+	local units = {}
 	-- first, filter by team status. One of all, own, friendly, or enemy should be included.
 	if string.match(query, "my") then
 		units = GetOwnUnits()
-	elseif string.match(query, "enemy") then
-		allunits = GetAllUnits()
-		units = {}
-		for i, unit in ipairs(allunits) do
-			if World.isEnemyTeam(unit:GetTeamID()) then
+	elseif string.match(query, "hostile") then
+		for i, unit in ipairs(GetAllUnits()) do
+			if World.isEnemy(unit) then
 				table.insert(units, unit)
 			end
 		end
 	elseif string.match(query, "friendly") then
-		allunits = GetAllUnits()
-		units = {}
-		for i, unit in ipairs(allunits) do
+		for i, unit in ipairs(GetAllUnits()) do
 			if World.isFriendlyTeam(unit:GetTeamID()) then
 				table.insert(units, unit)
 			end
@@ -196,7 +200,7 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 		units = GetAllUnits()
 	end
 
-	if string.match(query, "fleet") then
+	if string.match(query, "fleet") then -- you can only see your own fleets anyway.
 		units = GetOwnFleets()
 	end
 
