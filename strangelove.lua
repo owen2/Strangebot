@@ -169,6 +169,27 @@ function strangelove.nukepanic()
 end
 
 function strangelove.moveBoats()
+	local scoremode = GetOptionValue("ScoreMode")
+	if scoremode == 1 then
+		strangelove.moveBoatsDefensive()
+	else
+		strangelove.moveBoatsAgressive()
+	end
+end
+
+function strangelove.moveBoatsDefensive() -- move subs to assault position, keep carriers and BattleShips on home coast
+	local boats = World.Get("my subs")
+	for _, sub in ipairs(boats) do
+		x,y = World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude())
+		sub:SetMovementTarget(x + ((math.random() * 10) - 5), y + ((math.random() * 10) - 5))
+	end
+	boats = World.Get("my carriers")
+	for _, carrier in ipairs(boats) do
+		carrier:SetState(2)
+	end
+end
+
+function strangelove.moveBoatsAgressive() -- move all boats to assault position for sea battle and naval nuking
 	units = World.Get("my sea units")
 	for _, unit in ipairs(units) do
 		x, y = World.GetNearestEnemyCoast(unit:GetLongitude(),unit:GetLatitude())

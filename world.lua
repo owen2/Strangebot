@@ -20,6 +20,10 @@ function World.GetOwnCities()
 	return myCities
 end
 
+function World.GetTargets()
+
+end
+
 function World.GetOwnPopulationCenter() --returns the coordinates of the population center
 	local cities = World.GetOwnCities()
 	World.popsort(cities)
@@ -275,6 +279,12 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 			if unit:GetUnitType() == "Nuke" then table.insert(typeunit, unit) end
 		end
 		units= typeunit
+	elseif string.match(query, "cit") then
+		typeunit = {}
+		for _, unit in ipairs(units) do
+			if unit:GetUnitType() == "City" then table.insert(typeunit, unit) end
+		end
+		units = typeunit
 	end
 	-- filter "with nukes"
 	if string.match(query, "with nukes") then

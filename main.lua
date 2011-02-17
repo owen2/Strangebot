@@ -16,15 +16,16 @@ require "Whiteboard" -- A library for easier Whiteboard drawing
 require "world" -- A perception model for the world to get info from
 require "strangelove" -- The higher level strategy code for the AI
 require "Multithreading" -- A coroutine queuing library
-require "graph" -- A graph library
+--require "graph" -- A graph library
 
 ---------------------------------
 -- Some Global Variables here.	-
 ---------------------------------
 DefconLevel = 0 -- the stage of the game
 j = 0 -- a global index for next target in target list
-targetCities = {} -- A list of target cities
+observable = {} -- A table of all observable objects in the world.
 placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running
+
 --map = Graph.readgraph("AI\strangebot\world.graph") -- Created a graph of connected territories and oceans
 
 -- Required by luabot binding. Fires when the agent is selected.
@@ -35,13 +36,14 @@ end
 
 -- Also required. 100ms execution time limit. Use it well.
 function OnTick()
+	GetAllUnitData(observable) -- update the state of the world
 	---------------------------------------------------------
 	-- Place for any first tick of defcon __ strategies.	-
 	---------------------------------------------------------
 	if (DefconLevel ~= GetDefconLevel()) then
 		DefconLevel = GetDefconLevel()
 		if     (DefconLevel == 5) then RequestGameSpeed(20)
-		elseif (DefconLevel == 4) then targetCities = World.GetTargetCities()
+		elseif (DefconLevel == 4) then
 		elseif (DefconLevel == 3) then
 		elseif (DefconLevel == 2) then
 		elseif (DefconLevel == 1) then
