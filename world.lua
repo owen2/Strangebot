@@ -24,7 +24,21 @@ function World.GetTargets()
 
 end
 
-function World.GetOwnPopulationCenter() --returns the coordinates of the population center
+function World.GetOwnPopulationCenterDefensive()
+	local cities = World.GetOwnCities()
+	World.popsort(cities)
+	local longs = 0
+	local lats = 0
+	for _, city in ipairs(cities) do
+		longs = longs + city:GetLongitude()
+		lats = lats + city:GetLatitude()
+	end
+	Whiteboard.drawCircle(longs / # cities, lats/ # cities , 5)
+	Whiteboard.drawCircle(cities[1]:GetLongitude(), cities[1]:GetLatitude(), 5)
+	return (((longs / # cities) + cities[1]:GetLongitude())/2), (((lats / # cities) + cities[1]:GetLatitude())/2)
+end
+
+function World.GetOwnPopulationCenterAgressive() --returns the coordinates of the population center
 	local cities = World.GetOwnCities()
 	World.popsort(cities)
 	local longs = 0
@@ -57,7 +71,7 @@ function World.proxsort(targs, long, lat)
 end
 
 function World.popsort(cityList)
-	table.sort(cityList, function(a, b) return a:GetCityPopulation() < b:GetCityPopulation() end)
+	table.sort(cityList, function(a, b) return a:GetCityPopulation() > b:GetCityPopulation() end)
 end
 
 function World.isFriendlyTeam(teamID)

@@ -52,20 +52,10 @@ end
 function strangelove.buildHiveByPopulationCenter()
 	NewThread(function()
 		if (placed ~= 1) then
-			baselong, baselat = World.GetOwnPopulationCenter()
+			baselong, baselat = World.GetOwnPopulationCenterDefensive()
 			Whiteboard.drawCircle(baselong, baselat, 5)
 			DebugLog("baselong, baselat: "..baselong..", "..baselat)
 			PlaceStructure(baselong, baselat, "RadarStation")
-			--[[PlaceStructure(baselong, baselat, "Silo")
-			Wait(true)
-			PlaceStructure(baselong + 5.1, baselat, "Silo")
-			Wait(true)
-			PlaceStructure(baselong - 5.1, baselat, "Silo")
-			Wait(true)
-			PlaceStructure(baselong, baselat + 5.1, "Silo")
-			Wait(true)
-			PlaceStructure(baselong, baselat - 5.1, "Silo")
-			Wait(true)]]--
 			strangelove.buildRing(baselong, baselat, 5.1, "Silo")
 			strangelove.buildStuffRandom() -- Build the stuff we forgot.
 		end
@@ -76,10 +66,6 @@ end
 
 
 function strangelove.buildStuffRandom()
-	-- TODO: Make strategy for placing land and sea units. For now, is random.
-	--myCities = World.GetOwnCities()
-	--myCities = World.popsort(myCities)
-	--for i=1,12 do
 	if (placed ~= 1) then
 		if GetRemainingUnits("Silo") > 0 then
 			DebugLog(GetRemainingUnits("Silo").." silos left")
@@ -240,4 +226,31 @@ function strangelove.buildRing(x, y, radius, unitType)
 			dx, dy = nx, ny
 		end
 
+end
+
+micro = {}
+
+function micro.airbaseDefensive()
+	if GetGameTick() % 10 == 0 then
+		local bases = World.Get("my airbases")
+		local bogies = World.Get("enemy planes")
+		for _, base in ipairs(bases) do
+			base:SetState(0)
+			World.proxsort(bogies, base:GetLongitude(), base:GetLatitude())
+			base:SetActionTarget(bogies[1])
+		end
+	end
+end
+
+function micro.airbaseScout()
+	if GetGameTick() % 50 == 0 then
+		local bases = World.Get("my airbases")
+		local spots = World.GetTargetCities()
+		for _, base in ipairs(bases) do
+			base:SetState(0)
+			for _, spots in ipairs(spot) do
+				base:SetActionTarget(spot)
+			end
+		end
+	end
 end
