@@ -144,27 +144,27 @@ end
 
 function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates.
 	bestlong, bestlat, bestdist = 0, 0, 360
-	d = GetSailDistance(x,y, 22, 60)
+	d = GetDistance(x,y, 22, 60)
 	if d < bestdist and World.isEnemyTerritory("Europe") then bestlong, bestlat, bestdist = 22, 60, d end
-	d = GetSailDistance(x,y, -65, 30)
+	d = GetDistance(x,y, -65, 30)
 	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -65, 30, d end
-	d = GetSailDistance(x,y, -145, 40)
+	d = GetDistance(x,y, -145, 40)
 	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -145, 40, d end
-	d = GetSailDistance(x,y, -100, 0)
+	d = GetDistance(x,y, -100, 0)
 	if d < bestdist and World.isEnemyTerritory("SouthAmerica") then bestlong, bestlat, bestdist = -100, 0, d end
-	d = GetSailDistance(x,y, -45, 15)
+	d = GetDistance(x,y, -45, 15)
 	if d < bestdist and World.isEnemyTerritory("SouthAmerica") then bestlong, bestlat, bestdist = -45, 15, d end
-	d = GetSailDistance(x,y, -10, -10)
+	d = GetDistance(x,y, -10, -10)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = -10, -10, d end
-	d = GetSailDistance(x,y, 60, 0)
+	d = GetDistance(x,y, 60, 0)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = 60, 0, d end
-	d = GetSailDistance(x,y, 90,0 )
+	d = GetDistance(x,y, 90,0 )
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 90, 0, d end
-	d = GetSailDistance(x,y, 135, 20)
+	d = GetDistance(x,y, 135, 20)
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 135, 20, d end
-	d = GetSailDistance(x,y, 60, 85)
+	d = GetDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
-	d = GetSailDistance(x,y, 175, 55)
+	d = GetDistance(x,y, 175, 55)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
 	return bestlong, bestlat
 
