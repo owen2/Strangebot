@@ -2,9 +2,9 @@
 -- Dr. Strangebot									-
 -- A lua based agent for Defcon						-
 -- by Owen Johnson									-
--- owen@owenjohnson.info							-
--- latest version at owenjohnson.info/dev/defcon	-
--- This is the skeleton that glues the project up.	-
+-- owen@owenjohnson.info							'--------------------
+-- latest version at http://github.com/owen2/Strangebot/zipball/master	-
+-- This is the skeleton that glues the project up.	,--------------------
 -----------------------------------------------------
 
 ---------------------------------
@@ -16,7 +16,8 @@ require "Whiteboard" -- A library for easier Whiteboard drawing
 require "world" -- A perception model for the world to get info from
 require "strangelove" -- The higher level strategy code for the AI
 require "Multithreading" -- A coroutine queuing library
---require "graph" -- A graph library
+require "micro" -- Micro level/event handling
+
 
 ---------------------------------
 -- Some Global Variables here.	-
@@ -31,7 +32,7 @@ placed = 0 -- Whether or not all units have been placed. (keeps spawning routine
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
 	SendChat("/name [BOT]Strangebot")
-	SendChat("Hi, I'm Owen's bot! See owenjohnson.info for more info.")
+	SendChat("Hi, I'm Owen's bot! See owenjohnson.info/cat/strangebot for more info.")
 end
 
 -- Also required. 100ms execution time limit. Use it well.
