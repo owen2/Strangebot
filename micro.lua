@@ -27,9 +27,13 @@ function micro.airbaseScout()
 		local spots = World.GetTargetCities()
 		for _, base in ipairs(bases) do
 			base:SetState(0)
-			for _, spots in ipairs(spot) do
-				base:SetActionTarget(spot)
-			end
+			base:SetActionTarget(spots[j])
 		end
 	end
+end
+
+function micro.bomberBail(bomber)
+	targets = World.GetTargetCities()
+	World.proxsort(targets, bomber:GetLatitude(), bomber:GetLongitude())
+	bomber:SetActionTarget(targets[1])
 end

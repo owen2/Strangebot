@@ -10,11 +10,9 @@
 
 strangelove = {}
 
+strangelove.personality = "aggressive" -- just for default's sake
 
--- Initial tick strategies based on defcon level.
--- On first tick of each defcon level, function will spawn as a coroutine, at the end of the tick, the coroutine will be blocked.
-
-function strangelove.makeFriends() -- Overall strategy for stage 5
+function strangelove.makeFriends()
 	RequestAlliance(GetAllianceID(strangelove.getBestAlly()))
 end
 
@@ -56,14 +54,13 @@ function strangelove.buildHiveByPopulationCenter()
 			Whiteboard.drawCircle(baselong, baselat, 5)
 			DebugLog("baselong, baselat: "..baselong..", "..baselat)
 			PlaceStructure(baselong, baselat, "RadarStation")
-			strangelove.buildRing(baselong, baselat, 5.1, "Silo")
+			if (strangelove.personality == "defensive") then local radius = 10 else local radius = 5.1 end
+			strangelove.buildRing(baselong, baselat, radius, "Silo")
 			strangelove.buildStuffRandom() -- Build the stuff we forgot.
 		end
 	end)
 
 end
-
-
 
 function strangelove.buildStuffRandom()
 	if (placed ~= 1) then
@@ -187,14 +184,6 @@ function strangelove.moveBoatsAgressive() -- move all boats to assault position 
 		x, y = World.GetNearestEnemyCoast(unit:GetLongitude(),unit:GetLatitude())
 		unit:SetMovementTarget(x + ((math.random() * 10) - 5),y + ((math.random() * 10) - 5))
 	end
-end
-
-function strangelove.scoutTargets()
-
-end
-
-function strangelove.endGame()
-
 end
 
 function strangelove.buildFleet(x, y, radius, unitType)

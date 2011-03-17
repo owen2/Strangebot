@@ -22,12 +22,10 @@ require "micro" -- Micro level/event handling
 ---------------------------------
 -- Some Global Variables here.	-
 ---------------------------------
+if GetOptionValue("ScoreMode") == 1 then strangelove.personality = "defensive" else strangelove.personality = "aggressive" end
 DefconLevel = 0 -- the stage of the game
 j = 0 -- a global index for next target in target list
-observable = {} -- A table of all observable objects in the world.
-placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running
-
---map = Graph.readgraph("AI\strangebot\world.graph") -- Created a graph of connected territories and oceans
+placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running)
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
@@ -37,7 +35,6 @@ end
 
 -- Also required. 100ms execution time limit. Use it well.
 function OnTick()
-	GetAllUnitData(observable) -- update the state of the world
 	---------------------------------------------------------
 	-- Place for any first tick of defcon __ strategies.	-
 	---------------------------------------------------------
@@ -56,7 +53,7 @@ function OnTick()
 		if (DefconLevel == 5) then	strangelove.buildHiveByPopulationCenter() end
 		if (DefconLevel == 4) then end
 		if (DefconLevel == 3) then end
-		if (DefconLevel == 2) then end
+		if (DefconLevel == 2) then micro.airbaseScout() end
 		if (DefconLevel == 1) then  strangelove.nukepanic() end
 	end
 	Resume(.05)
@@ -70,8 +67,7 @@ function OnEvent(eventType, sourceID, targetID, unitType, longitude, latitude)
 		--An object has been destroyed.
 	elseif (eventType == "Hit") then
 		--An object has been hit by a gunshot (ie. from a battleship, fighter etc).
-		--local tracker = Instance.ShotTrackers[sourceID:GetTeamID()]
-		--tracker.Hit(sourceID, targetID)
+		if (unitType == "Bomber") then micro.bomberBail(sourceID) end
 	elseif (eventType == "NewVote") then
 		--A new vote has been started
 		--SendVote(targetID, VoteYes)
