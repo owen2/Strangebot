@@ -25,7 +25,9 @@ function micro.airbaseScout()
 	if GetGameTick() % 50 == 0 then
 		local bases = World.Get("my airbases")
 		local spots = World.GetTargetCities()
-		for _, base in ipairs(bases) do
+
+		for _,base in ipairs(bases) do
+			World.proxsort(spots, base:GetLatitude(), base:GetLongitude())
 			base:SetState(0)
 			base:SetActionTarget(spots[j])
 		end
@@ -36,4 +38,61 @@ function micro.bomberBail(bomber)
 	targets = World.GetTargetCities()
 	World.proxsort(targets, bomber:GetLatitude(), bomber:GetLongitude())
 	bomber:SetActionTarget(targets[1])
+end
+
+function micro.seaBattle()
+
+end
+
+function micro.updateBoats()
+	boids = World.Get("my sea units from hell!")
+	for _,boid in ipairs(boids) do
+		lat1, long1 = micro.boidCohesion(boid)
+		lat2, long2 = micro.boidSpacing(boid)
+		lat3, long3 = micro.boidGoal(boid)
+
+		lat = boid:GetLatitude() + lat1 + lat2 + lat3
+		long = boid:GetLongitude() + long1 + long2 + long3
+
+		boid:SetMovementTarget(lat, long)
+	end
+end
+
+function micro.boidCohesion(boid)
+	local lat = 0
+	local long = 0
+	local boids = World.Get("my other sea units from hell!")
+	for _,boid_other in ipairs(boids) do
+		if boid ~= boid_other then
+			lat = lat + boid_other:GetLatitude()
+			long = long + boid_other:GetLongitude()
+		end
+	end
+
+	lat = lat / # boids - 1
+	long = long / # boids - 1
+	return lat / 100, long / 100 -- 100 is the rate of travel to center (1%)
+end
+
+function micro.boidSpacing(boid)
+
+	local lat = 0
+	local long = 0
+	local boids = World.Get("my other sea units from hell!")
+	for _,boid_other in ipairs(boids) do
+		if boid  ~= boid_other then
+			if GetDistance(boid:GetLatitude(), boid:GetLongitude(), boid_other:GetLatitude(), boid_other:GetLongitude()) < 3 then
+				lat = lat - (boid:GetLatitude() - boid_other:GetLatitude())
+				long = long - (boid:GetLongitude() - boid_other:GetLongitude())
+			end
+		end
+	end
+
+	return lat, long
+
+end
+
+function micro.boidGoal(boid)
+	lat, long = World.GetNearestEnemyCoast(boid:GetLatitude(), boid:GetLongitude())
+	return (lat - boid:GetLatitude()) / 2, (long - boid:GetLongitude()) /2 -- We'll try 50%
 end

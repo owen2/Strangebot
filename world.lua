@@ -152,9 +152,7 @@ function World.isAdjacentTerritory(ter1, ter2)
 	else return false end
 end
 
-function World.getPopulationCluster(teamID)
-	--TODO!
-end
+
 
 function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates.
 	bestlong, bestlat, bestdist = 0, 0, 360

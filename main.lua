@@ -50,11 +50,11 @@ function OnTick()
 		-------------------------------------
 		-- Stuff that happens every tick.	-
 		-------------------------------------
-		if (DefconLevel == 5) then	strangelove.buildHiveByPopulationCenter() end
-		if (DefconLevel == 4) then end
-		if (DefconLevel == 3) then end
+		if (DefconLevel == 5) then strangelove.buildHiveByPopulationCenter() strangelove.buildBoats() end
+		if (DefconLevel == 4) then strangelove.buildStuffRandom() micro.updateBoats() end --in case we forgot something
+		if (DefconLevel == 3) then micro.seaBattle() end
 		if (DefconLevel == 2) then micro.airbaseScout() end
-		if (DefconLevel == 1) then  strangelove.nukepanic() end
+		if (DefconLevel == 1) then strangelove.nukepanic() end
 	end
 	Resume(.05)
 end

@@ -11,6 +11,7 @@
 strangelove = {}
 
 strangelove.personality = "aggressive" -- just for default's sake
+-- OR -- ( "aggressive" | "defensive" | "reactive" )
 
 function strangelove.makeFriends()
 	RequestAlliance(GetAllianceID(strangelove.getBestAlly()))
@@ -46,20 +47,58 @@ function strangelove.allyUsefulness(team) -- return probability that ally will b
 	return usefulness
 end
 
+function strangelove.buildBoats()
+	strangelove.buildStuffRandom()
+	--strangelove.sendBoats()
+end
 
 function strangelove.buildHiveByPopulationCenter()
-	NewThread(function()
 		if (placed ~= 1) then
-			baselong, baselat = World.GetOwnPopulationCenterDefensive()
+			if (strangelove.personality == "defensive") then
+				baselong, baselat = World.GetOwnPopulationCenterDefensive()
+				radius = 10
+			else
+				baselong, baselat = World.GetOwnPopulationCenterDefensive()
+				radius = 5.1
+			end
 			Whiteboard.drawCircle(baselong, baselat, 5)
 			DebugLog("baselong, baselat: "..baselong..", "..baselat)
 			PlaceStructure(baselong, baselat, "RadarStation")
-			if (strangelove.personality == "defensive") then local radius = 10 else local radius = 5.1 end
 			strangelove.buildRing(baselong, baselat, radius, "Silo")
-			strangelove.buildStuffRandom() -- Build the stuff we forgot.
 		end
-	end)
+end
 
+function strangelove.buildFleet(x, y, radius, unitType)
+	--NewThread(function(x, y, radius, unitType)
+		local theta_step = math.pi * 2 / 6
+		local sin1, cos1 = math.sin(theta_step), math.cos(theta_step)
+		local dx = radius
+		local dy = 0
+		for i = 0, 6 do
+			local nx = cos1 * dx - sin1 * dy
+			local ny = sin1 * dx + cos1 * dy
+			PlaceFleet(x+nx, y+ny, unitType)
+			--Wait(true)
+			dx, dy = nx, ny
+		end
+	--end)
+end
+
+function strangelove.buildRing(x, y, radius, unitType)
+	--NewThread(function(x,y,radius. unitType)
+		local theta_step = math.pi * 2 / 6
+		local sin, cos = math.sin(theta_step), math.cos(theta_step)
+		local dx = radius
+		local dy = 0
+		for i = 0, 6 do
+			local nx = cos * dx - sin * dy
+			local ny = sin * dx + cos * dy
+			PlaceStructure(x + nx, y + ny, unitType)
+			--Wait(true)
+			WhiteboardDraw(x + dx, y + dy, x + nx, y + ny)
+			dx, dy = nx, ny
+		end
+	--end)
 end
 
 function strangelove.buildStuffRandom()
@@ -88,22 +127,22 @@ function strangelove.buildStuffRandom()
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "BattleShip")
-				--PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
-				strangelove.buildFleet(long, lat, 3, "BattleShip")
+				PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
+				--strangelove.buildFleet(long, lat, 3, "BattleShip")
 		elseif GetRemainingUnits("Carrier") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Carrier")
-				--PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
-				strangelove.buildFleet(long, lat,3 ,  "Carrier")
+				PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
+				--strangelove.buildFleet(long, lat,3 ,  "Carrier")
 		elseif GetRemainingUnits("Sub") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Sub")
-				--PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
-				strangelove.buildFleet(long, lat,3, "Sub")
+				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+				--strangelove.buildFleet(long, lat,3, "Sub")
 		else
-			strangelove.moveBoats()
+			--strangelove.moveBoats()
 			placed= 1
 		end
 	end
@@ -157,7 +196,7 @@ function strangelove.nukepanic()
 	end
 end
 
-function strangelove.moveBoats()
+function strangelove.sendBoats()
 	local scoremode = GetOptionValue("ScoreMode")
 	if scoremode == 1 or string.match("NorthAmerica SouthAmerica Africa",World.territoryOf(GetOwnTeamID())) then
 		strangelove.moveBoatsDefensive()
@@ -186,33 +225,4 @@ function strangelove.moveBoatsAgressive() -- move all boats to assault position 
 	end
 end
 
-function strangelove.buildFleet(x, y, radius, unitType)
 
-		local theta_step = math.pi * 2 / 6
-		local sin1, cos1 = math.sin(theta_step), math.cos(theta_step)
-		local dx = radius
-		local dy = 0
-		for i = 1, 6 do
-			local nx = cos1 * dx - sin1 * dy
-			local ny = sin1 * dx + cos1 * dy
-			PlaceFleet(x+nx, y+ny, unitType)
-			Wait(true)
-			dx, dy = nx, ny
-		end
-end
-
-function strangelove.buildRing(x, y, radius, unitType)
-		local theta_step = math.pi * 2 / 6
-		local sin, cos = math.sin(theta_step), math.cos(theta_step)
-		local dx = radius
-		local dy = 0
-		for i = 1, 6 do
-			local nx = cos * dx - sin * dy
-			local ny = sin * dx + cos * dy
-			PlaceStructure(x + nx, y + ny, unitType)
-			Wait(true)
-			WhiteboardDraw(x + dx, y + dy, x + nx, y + ny)
-			dx, dy = nx, ny
-		end
-
-end
