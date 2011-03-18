@@ -45,16 +45,21 @@ function micro.seaBattle()
 end
 
 function micro.updateBoats()
-	boids = World.Get("my sea units from hell!")
-	for _,boid in ipairs(boids) do
-		lat1, long1 = micro.boidCohesion(boid)
-		lat2, long2 = micro.boidSpacing(boid)
-		lat3, long3 = micro.boidGoal(boid)
+	if GetGameTick() % 50 == 0 then
+		boids = World.Get("my sea units from hell!")
+		for _,boid in ipairs(boids) do
+			DebugLog(boid:GetStateTimer())
+			if boid:GetStateTimer() == 0 then -- only move if not doing anything useful.
+				lat1, long1 = micro.boidCohesion(boid)
+				lat2, long2 = micro.boidSpacing(boid)
+				lat3, long3 = micro.boidGoal(boid)
 
-		lat = boid:GetLatitude() + lat1 + lat2 + lat3
-		long = boid:GetLongitude() + long1 + long2 + long3
+				lat = boid:GetLatitude() + lat1 + lat2 + lat3
+				long = boid:GetLongitude() + long1 + long2 + long3
 
-		boid:SetMovementTarget(lat, long)
+				boid:SetMovementTarget(lat, long)
+			end
+		end
 	end
 end
 
@@ -94,5 +99,5 @@ end
 
 function micro.boidGoal(boid)
 	lat, long = World.GetNearestEnemyCoast(boid:GetLatitude(), boid:GetLongitude())
-	return (lat - boid:GetLatitude()) / 2, (long - boid:GetLongitude()) /2 -- We'll try 50%
+	return (lat - boid:GetLatitude()), (long - boid:GetLongitude()) -- We'll try 50%
 end

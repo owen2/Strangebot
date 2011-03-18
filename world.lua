@@ -176,8 +176,8 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 135, 20, d end
 	d = GetDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
-	d = GetDistance(x,y, 175, 55)
-	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
+	--d = GetDistance(x,y, 175, 55)
+	--if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
 	return bestlong, bestlat
 
 end

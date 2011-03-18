@@ -51,12 +51,13 @@ function OnTick()
 		-- Stuff that happens every tick.	-
 		-------------------------------------
 		if (DefconLevel == 5) then strangelove.buildHiveByPopulationCenter() strangelove.buildBoats() end
-		if (DefconLevel == 4) then strangelove.buildStuffRandom() micro.updateBoats() end --in case we forgot something
+		if (DefconLevel == 4) then strangelove.buildStuffRandom() end --in case we forgot something
 		if (DefconLevel == 3) then micro.seaBattle() end
 		if (DefconLevel == 2) then micro.airbaseScout() end
 		if (DefconLevel == 1) then strangelove.nukepanic() end
 	end
 	Resume(.05)
+	micro.updateBoats()
 end
 
 -- Required function. fires whenever an event happens in the game.

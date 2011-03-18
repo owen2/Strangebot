@@ -169,8 +169,8 @@ function strangelove.nukepanic()
 				target = targets[j % # targets]
 				j=j+1
 				sub:SetActionTarget(target)
-			else
-				sub:SetMovementTarget(tlong, tlat)
+			--else
+			--	sub:SetMovementTarget(tlong, tlat)
 			end
 		end
 		airbases = World.Get("my airbases with nukes")
