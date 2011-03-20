@@ -24,8 +24,8 @@ require "micro" -- Micro level/event handling
 ---------------------------------
 if GetOptionValue("ScoreMode") == 1 then strangelove.personality = "defensive" else strangelove.personality = "aggressive" end
 DefconLevel = 0 -- the stage of the game
-j = 0 -- a global index for next target in target list
-placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running)
+j = 0 -- a global index for next target in target list TODO: Global Launch queuing this is really a hack
+placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running) Saves lots of computation
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
@@ -33,7 +33,7 @@ function OnInit()
 	SendChat("Hi, I'm Owen's bot! See owenjohnson.info/cat/strangebot for more info.")
 end
 
--- Also required. 100ms execution time limit. Use it well.
+-- Also required. 100ms execution time limit. Use it wisely.
 function OnTick()
 	---------------------------------------------------------
 	-- Place for any first tick of defcon __ strategies.	-

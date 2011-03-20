@@ -45,7 +45,7 @@ function micro.seaBattle()
 end
 
 function micro.updateBoats()
-	if GetGameTick() % 50 == 0 then
+	if GetGameTick() % 50  == 0 and placed == 1 then
 		boids = World.Get("my sea units from hell!")
 		for _,boid in ipairs(boids) do
 			DebugLog(boid:GetStateTimer())
@@ -101,3 +101,12 @@ function micro.boidGoal(boid)
 	lat, long = World.GetNearestEnemyCoast(boid:GetLatitude(), boid:GetLongitude())
 	return (lat - boid:GetLatitude()), (long - boid:GetLongitude()) -- We'll try 50%
 end
+
+function micro.boidGoal_crap(ship)
+	local targs = World.Get("Hostile Cities")
+	World.popsort(targs)
+	local biggest = targs[1]
+	lat, long = biggest:GetLatitude(), biggest:GetLongitude()
+	return lat  * .5, long * .5
+end
+

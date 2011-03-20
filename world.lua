@@ -51,7 +51,7 @@ function World.GetOwnPopulationCenterAgressive() --returns the coordinates of th
 end
 
 function World.GetTargetCities()
-	DebugLog("Getting list of own cities...")
+	DebugLog("Generating Target List...")
 	allCities= GetCityIDs()
 	hometeam = GetOwnTeamID()
 	friendly = GetAllianceID(hometeam)
@@ -152,7 +152,16 @@ function World.isAdjacentTerritory(ter1, ter2)
 	else return false end
 end
 
-
+function World.CountEnemiesNear(lat, long, radius)
+	badCities = World.Get("hostile cities")
+	local population = 0
+	for _, city in ipairs(badCities) do
+		if GetDistance(lat, long, city:GetLatitude(), city:GetLongitude()) < radius then
+			population = population + cityGetCityPopulation()
+		end
+	end
+	return population
+end
 
 function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates.
 	bestlong, bestlat, bestdist = 0, 0, 360
