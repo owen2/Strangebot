@@ -2,11 +2,10 @@ Dr.Strangebot An AI Agent for DEFCON
 by Owen Johnson
 owen@owenjohnson.info
 
-You need to rename the folder these files are in to strangebot and place it in the AI folder of defcon.
-You may also rename the .dll and the folder so they match if you want to rename the bot you built based on this one.
+This is an AI agent to play the commercial game DEFCON, a nuclear warfare simulation. Included is a world information library I made (feel free to steal it for your own bot) and a luabot skelleton file I made (also feel free to steal). The agent was created to research realtime decision making, partially observable worlds, and stochastic actions.
+
+You need to rename the folder these files are in to `strangebot` and place it in the AI folder of defcon. Then load the bot enabled version of the game to load it as a player.
 
 Uses Martin's multithreadding and someone's whiteboard library
 
-License
-
-CC-by-nc
+License: cc-by-nc
