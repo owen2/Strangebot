@@ -49,11 +49,10 @@ end
 
 function strangelove.buildBoats()
 	strangelove.buildStuffRandom()
-	--strangelove.sendBoats()
 end
 
 function strangelove.buildHiveByPopulationCenter()
-		if (placed ~= 1) then
+		if (flag_placed ~= 1) then
 			if (strangelove.personality == "defensive") then
 				baselong, baselat = World.GetOwnPopulationCenterDefensive()
 				radius = 10
@@ -62,7 +61,7 @@ function strangelove.buildHiveByPopulationCenter()
 				radius = 5.1
 			end
 			Whiteboard.drawCircle(baselong, baselat, 5)
-			DebugLog("baselong, baselat: "..baselong..", "..baselat)
+			DebugLog("Hive goes here: "..baselong..", "..baselat)
 			PlaceStructure(baselong, baselat, "RadarStation")
 			strangelove.buildRing(baselong, baselat, radius, "Silo")
 		end
@@ -102,7 +101,7 @@ function strangelove.buildRing(x, y, radius, unitType)
 end
 
 function strangelove.buildStuffRandom()
-	if (placed ~= 1) then
+	if (flag_placed ~= 1) then
 		if GetRemainingUnits("Silo") > 0 then
 			DebugLog(GetRemainingUnits("Silo").." silos left")
 			repeat
@@ -142,8 +141,7 @@ function strangelove.buildStuffRandom()
 				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
 				--strangelove.buildFleet(long, lat,3, "Sub")
 		else
-			--strangelove.moveBoats()
-			placed= 1
+			flag_placed= 1
 		end
 	end
 end
@@ -162,15 +160,12 @@ function strangelove.nukepanic()
 		subs = World.Get("my subs with nukes")
 		for _, sub in ipairs(subs) do
 			clong, clat = sub:GetLongitude(), sub:GetLatitude()
-			tlong, tlat = World.GetNearestEnemyCoast(clong, clat)
-			--DebugLog(clong.." "..clat.." "..tlong.." "..tlat)
+			tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
 			if GetDistance(clong, clat, tlong, tlat) < 20 then
 				sub:SetState(2)
 				target = targets[j % # targets]
 				j=j+1
 				sub:SetActionTarget(target)
-			--else
-			--	sub:SetMovementTarget(tlong, tlat)
 			end
 		end
 		airbases = World.Get("my airbases with nukes")
@@ -182,7 +177,6 @@ function strangelove.nukepanic()
 			target = targets[j % # targets]
 			j=j+1
 			base:SetActionTarget(target)
-			--DebugLog("Told airbase to launch.")
 		end
 		airbases = World.Get("my carriers with nukes")
 		for _,base in ipairs(airbases) do
@@ -191,38 +185,6 @@ function strangelove.nukepanic()
 			target = targets[j % # targets]
 			j=j+1
 			base:SetActionTarget(target)
-			--DebugLog("Told airbase to launch.")
 		end
 	end
 end
-
-function strangelove.sendBoats()
-	local scoremode = GetOptionValue("ScoreMode")
-	if scoremode == 1 or string.match("NorthAmerica SouthAmerica Africa",World.territoryOf(GetOwnTeamID())) then
-		strangelove.moveBoatsDefensive()
-	else
-		strangelove.moveBoatsAgressive()
-	end
-end
-
-function strangelove.moveBoatsDefensive() -- move subs to assault position, keep carriers and BattleShips on home coast
-	local boats = World.Get("my subs")
-	for _, sub in ipairs(boats) do
-		x,y = World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude())
-		sub:SetMovementTarget(x + ((math.random() * 10) - 5), y + ((math.random() * 10) - 5))
-	end
-	boats = World.Get("my carriers")
-	for _, carrier in ipairs(boats) do
-		carrier:SetState(2)
-	end
-end
-
-function strangelove.moveBoatsAgressive() -- move all boats to assault position for sea battle and naval nuking
-	units = World.Get("my sea units")
-	for _, unit in ipairs(units) do
-		x, y = World.GetNearestEnemyCoast(unit:GetLongitude(),unit:GetLatitude())
-		unit:SetMovementTarget(x + ((math.random() * 10) - 5),y + ((math.random() * 10) - 5))
-	end
-end
-
-

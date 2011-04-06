@@ -40,15 +40,11 @@ function micro.bomberBail(bomber)
 	bomber:SetActionTarget(targets[1])
 end
 
-function micro.seaBattle()
-
-end
-
 function micro.updateBoats()
-	if GetGameTick() % 50  == 0 and placed == 1 then
-		boids = World.Get("my sea units from hell!")
+	if GetGameTick() % 50  == 0 and flag_placed == 1 then
+		boids = World.Get("my sea")
 		for _,boid in ipairs(boids) do
-			DebugLog(boid:GetStateTimer())
+			--DebugLog(boid:GetStateTimer())
 			if boid:GetStateTimer() == 0 then -- only move if not doing anything useful.
 				long1, lat1 = micro.boidFollow(boid, .1, "my sea")
 				long2, lat2 = micro.boidSpacing(boid, 3)
@@ -58,8 +54,9 @@ function micro.updateBoats()
 				long = boid:GetLongitude() + long1 + long2 + long3
 
 				boid:SetMovementTarget(long, lat)
-				if (~IsSea(long, lat)) then
+				if (not(IsSea(long, lat))) then
 					DebugLog("Bad Sea Coordinate: "..long..","..lat)
+					boid:SetMovementTarget(long + math.random(0,10)-5, lat + math.random(0,10)-5)
 					--Whiteboard.DrawCross(long, lat, 1)
 				end
 			end
@@ -107,50 +104,3 @@ function micro.boidGoal(boid)
 	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.boidFollow(boid, 1,"my carriers") end
 	return (long * .9) - boid:GetLongitude(), (lat * .9) - boid:GetLatitude()
 end
---[[
-function micro.SubGoal(boid)
-	lat, long = World.GetNearestEnemyCoast(boid:GetLatitude(), boid:GetLongitude())
-	return (lat - boid:GetLatitude()), (long - boid:GetLongitude())
-end
-
-function micro.CarrierGoal(boid)
-	local lat = 0
-	local long = 0
-	local subs = World.Get("my subs")
-	for _,sub in ipairs(boids) do
-		if boid ~= sub then
-			lat = lat + sub:GetLatitude()
-			long = long + sub:GetLongitude()
-		end
-	end
-
-	lat = lat / # subs - 1
-	long = long / # subs - 1
-	return lat,long
-end
-
-function micro.BattleShipGoal(boid)
-		local lat = 0
-	local long = 0
-	local subs = World.Get("my subs")
-	for _,sub in ipairs(boids) do
-		if boid ~= sub then
-			lat = lat + sub:GetLatitude()
-			long = long + sub:GetLongitude()
-		end
-	end
-
-	lat = lat / # subs - 1
-	long = long / # subs - 1
-	return lat,long
-end
-
-function micro.boidGoal_crap(ship)
-	local targs = World.Get("Hostile Cities")
-	World.popsort(targs)
-	local biggest = targs[1]
-	lat, long = biggest:GetLatitude(), biggest:GetLongitude()
-	return lat  * .5, long * .5
-end
-
-]]--

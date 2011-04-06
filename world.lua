@@ -51,7 +51,7 @@ function World.GetOwnPopulationCenterAgressive() --returns the coordinates of th
 end
 
 function World.GetTargetCities()
-	DebugLog("Generating Target List...")
+	--DebugLog("Generating Target List...")
 	allCities= GetCityIDs()
 	hometeam = GetOwnTeamID()
 	friendly = GetAllianceID(hometeam)
@@ -152,11 +152,11 @@ function World.isAdjacentTerritory(ter1, ter2)
 	else return false end
 end
 
-function World.CountEnemiesNear(lat, long, radius)
+function World.CountEnemiesNear(long, lat, radius)
 	badCities = World.Get("hostile cities")
 	local population = 0
 	for _, city in ipairs(badCities) do
-		if GetDistance(lat, long, city:GetLatitude(), city:GetLongitude()) < radius then
+		if GetDistance(long, lat, city:GetLongitude(), city:GetLatitude()) < radius then
 			population = population + cityGetCityPopulation()
 		end
 	end
@@ -229,7 +229,7 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 	if string.match(query, "land") then
 		landunits = {}
 		for i, unit in ipairs(units) do
-			if string.match("Silo AirBase RadarStation", unit:GetUnitType()) then
+			if string.match("SiloAirBaseRadarStation", unit:GetUnitType()) then
 				table.insert(landunits, unit)
 			end
 		end
@@ -237,7 +237,7 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 	elseif string.match(query, "sea") then
 		seaunits = {}
 		for i, unit in ipairs(units) do
-			if string.match("BattleShip Carrier Sub", unit:GetUnitType()) then
+			if string.match("BattleShipCarrierSub", unit:GetUnitType()) then
 				table.insert(seaunits, unit)
 			end
 		end
@@ -245,7 +245,7 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 	elseif string.match(query, "planes") then
 		airunits = {}
 		for i, unit in ipairs(units) do
-			if string.match("Fighter Bomber", unit:GetUnitType()) then
+			if string.match("FighterBomber", unit:GetUnitType()) then
 				table.insert(airunits, unit)
 			end
 		end

@@ -25,7 +25,9 @@ require "micro" -- Micro level/event handling
 if GetOptionValue("ScoreMode") == 1 then strangelove.personality = "defensive" else strangelove.personality = "aggressive" end
 DefconLevel = 0 -- the stage of the game
 j = 0 -- a global index for next target in target list TODO: Global Launch queuing this is really a hack
-placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running) Saves lots of computation
+flag_placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running) Saves lots of computation
+flag_silos_free = 0
+flag_subs_free = 0
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
@@ -35,6 +37,10 @@ end
 
 -- Also required. 100ms execution time limit. Use it wisely.
 function OnTick()
+
+	local x = os.clock()
+	local s = 0
+
 	---------------------------------------------------------
 	-- Place for any first tick of defcon __ strategies.	-
 	---------------------------------------------------------
@@ -52,12 +58,16 @@ function OnTick()
 		-------------------------------------
 		if (DefconLevel == 5) then strangelove.buildHiveByPopulationCenter() strangelove.buildBoats() end
 		if (DefconLevel == 4) then strangelove.buildStuffRandom() end --in case we forgot something
-		if (DefconLevel == 3) then micro.seaBattle() end
+		if (DefconLevel == 3) then end
 		if (DefconLevel == 2) then micro.airbaseScout() end
 		if (DefconLevel == 1) then strangelove.nukepanic() end
 	end
-	Resume(.05)
+	Resume(.05) -- Wake up threads (if any)
 	micro.updateBoats()
+
+	DebugLog(string.format("tick load: %3.0f%%", (os.clock() - x)*1000))
+
+
 end
 
 -- Required function. fires whenever an event happens in the game.
