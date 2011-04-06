@@ -149,23 +149,32 @@ end
 function strangelove.nukepanic()
 	local targets = World.GetTargetCities()
 	if GetGameTick() % 10 == 0 then
-		silos = World.Get("my silos with nukes")
-		for _, silo in ipairs(silos) do
-			silo:SetState(0)
-				World.proxsort(targets, silo:GetLongitude(), silo:GetLatitude())
-				target = targets[j % # targets]
-				j=j+1
-				silo:SetActionTarget(target)
+		if flag_silos_free == 1 then
+			silos = World.Get("my silos with nukes")
+			for _, silo in ipairs(silos) do
+				silo:SetState(0)
+					World.proxsort(targets, silo:GetLongitude(), silo:GetLatitude())
+					target = targets[j % # targets]
+					j=j+1
+					silo:SetActionTarget(target)
+			end
+		else
+			DebugLog("Silo Flag not yet raised.")
 		end
-		subs = World.Get("my subs with nukes")
+
+		subs = World.Get("my subs")
 		for _, sub in ipairs(subs) do
-			clong, clat = sub:GetLongitude(), sub:GetLatitude()
-			tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
-			if GetDistance(clong, clat, tlong, tlat) < 20 then
-				sub:SetState(2)
-				target = targets[j % # targets]
-				j=j+1
-				sub:SetActionTarget(target)
+			if sub:GetNukeCount() > 0 then
+				clong, clat = sub:GetLongitude(), sub:GetLatitude()
+				tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
+				if GetDistance(clong, clat, tlong, tlat) < 20 then
+					sub:SetState(2)
+					target = targets[j % # targets]
+					j=j+1
+					sub:SetActionTarget(target)
+				end
+			else
+				sub:SetState(1)
 			end
 		end
 		airbases = World.Get("my airbases with nukes")

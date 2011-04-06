@@ -12,7 +12,7 @@ micro = {}
 function micro.airbaseDefensive()
 	if GetGameTick() % 10 == 0 then
 		local bases = World.Get("my airbases")
-		local bogies = World.Get("enemy planes")
+		local bogies = World.Get("hostile planes")
 		for _, base in ipairs(bases) do
 			base:SetState(0)
 			World.proxsort(bogies, base:GetLongitude(), base:GetLatitude())
@@ -37,7 +37,14 @@ end
 function micro.bomberBail(bomber)
 	targets = World.GetTargetCities()
 	World.proxsort(targets, bomber:GetLatitude(), bomber:GetLongitude())
+	bomber:SetState(1)
 	bomber:SetActionTarget(targets[1])
+	DebugLog("Owch My Bomber!")
+end
+
+function micro.subBail(sub)
+	sub:SetState(1)
+	DebugLog("Owch My SUB!")
 end
 
 function micro.updateBoats()
@@ -99,8 +106,16 @@ function micro.boidSpacing(boid, distance)
 end
 
 function micro.boidGoal(boid)
-	if     boid:GetUnitType() == "Sub" then long, lat = World.GetNearestEnemyCoast(boid:GetLongitude(), boid:GetLatitude())
+	if     boid:GetUnitType() == "Sub" then long, lat = micro.subGoal(boid)
 	elseif boid:GetUnitType() == "Carrier" then long, lat = micro.boidFollow(boid, 1, "my subs")
 	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.boidFollow(boid, 1,"my carriers") end
 	return (long * .9) - boid:GetLongitude(), (lat * .9) - boid:GetLatitude()
+end
+
+function micro.subGoal(sub)
+	if sub:GetNukeCount() > 0 then
+		return World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude())
+	else
+		return micro.boidFollow(sub, 1,"hostile sea")
+	end
 end

@@ -27,7 +27,7 @@ DefconLevel = 0 -- the stage of the game
 j = 0 -- a global index for next target in target list TODO: Global Launch queuing this is really a hack
 flag_placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running) Saves lots of computation
 flag_silos_free = 0
-flag_subs_free = 0
+flag_subs_free = 1
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
@@ -72,13 +72,16 @@ end
 
 -- Required function. fires whenever an event happens in the game.
 function OnEvent(eventType, sourceID, targetID, unitType, longitude, latitude)
+	DebugLog("eventType: "..eventType.." sourceID: "..sourceID.." unitType: "..unitType.." loc: "..longitude..", "..latitude)
 	if (eventType == "CeasedFire") then
 		--A team ceased fire to another team.
 	elseif (eventType == "Destroyed") then
 		--An object has been destroyed.
+		if (unitType == "Sub") then flag_silos_free = 1 end
 	elseif (eventType == "Hit") then
 		--An object has been hit by a gunshot (ie. from a battleship, fighter etc).
-		if (unitType == "Bomber") then micro.bomberBail(sourceID) end
+		if (unitType == "Bomber" or unitType == "Carrier" or unitType == "AirBase") then micro.bomberBail(sourceID) end
+		if (unitType == "Sub") then micro.subBail(sourceID) end
 	elseif (eventType == "NewVote") then
 		--A new vote has been started
 		--SendVote(targetID, VoteYes)
@@ -86,6 +89,7 @@ function OnEvent(eventType, sourceID, targetID, unitType, longitude, latitude)
 	elseif (eventType == "NukeLaunchSilo") then
 		--A missile has been launched from a silo at given coordinates.
 	elseif (eventType == "NukeLaunchSub") then
+		flag_silos_free = 1
 		--A missile has been launched from a sub at given coordinates.
 	elseif (eventType == "PingCarrier") then
 		--A sonar ping from a carrier has been detected (gives object id).

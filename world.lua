@@ -164,11 +164,11 @@ function World.CountEnemiesNear(long, lat, radius)
 end
 
 function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates.
-	bestlong, bestlat, bestdist = 0, 0, 360
+	bestlong, bestlat, bestdist = 500, 500, 3600
 	d = GetDistance(x,y, 22, 60)
 	if d < bestdist and World.isEnemyTerritory("Europe") then bestlong, bestlat, bestdist = 22, 60, d end
-	d = GetDistance(x,y, -65, 30)
-	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -65, 30, d end
+	d = GetDistance(x,y, -70, 37)
+	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -70, 37, d end
 	d = GetDistance(x,y, -145, 40)
 	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -145, 40, d end
 	d = GetDistance(x,y, -100, 0)
@@ -179,10 +179,10 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = -10, -10, d end
 	d = GetDistance(x,y, 60, 0)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = 60, 0, d end
-	d = GetDistance(x,y, 90,0 )
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 90, 0, d end
-	d = GetDistance(x,y, 135, 20)
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 135, 20, d end
+	d = GetDistance(x,y, 85,0 )
+	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 85, 0, d end
+	d = GetDistance(x,y, 133, 24)
+	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 133, 24, d end
 	d = GetDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	--d = GetDistance(x,y, 175, 55)
