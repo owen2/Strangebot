@@ -50,23 +50,28 @@ function micro.updateBoats()
 		for _,boid in ipairs(boids) do
 			DebugLog(boid:GetStateTimer())
 			if boid:GetStateTimer() == 0 then -- only move if not doing anything useful.
-				lat1, long1 = micro.boidCohesion(boid)
-				lat2, long2 = micro.boidSpacing(boid)
-				lat3, long3 = micro.boidGoal(boid)
+				long1, lat1 = micro.boidFollow(boid, .1, "my sea")
+				long2, lat2 = micro.boidSpacing(boid, 3)
+				long3, lat3 = micro.boidGoal(boid)
 
 				lat = boid:GetLatitude() + lat1 + lat2 + lat3
 				long = boid:GetLongitude() + long1 + long2 + long3
 
-				boid:SetMovementTarget(lat, long)
+				boid:SetMovementTarget(long, lat)
+				if (~IsSea(long, lat)) then
+					DebugLog("Bad Sea Coordinate: "..long..","..lat)
+					--Whiteboard.DrawCross(long, lat, 1)
+				end
 			end
 		end
 	end
 end
 
-function micro.boidCohesion(boid)
+function micro.boidFollow(boid, rate, query)
 	local lat = 0
 	local long = 0
-	local boids = World.Get("my other sea units from hell!")
+	--local boids = World.Get("my other sea units from hell!")
+	local boids = World.Get(query)
 	for _,boid_other in ipairs(boids) do
 		if boid ~= boid_other then
 			lat = lat + boid_other:GetLatitude()
@@ -76,30 +81,68 @@ function micro.boidCohesion(boid)
 
 	lat = lat / # boids - 1
 	long = long / # boids - 1
-	return lat / 100, long / 100 -- 100 is the rate of travel to center (1%)
+	return long * rate, lat * rate
 end
 
-function micro.boidSpacing(boid)
+function micro.boidSpacing(boid, distance)
 
 	local lat = 0
 	local long = 0
 	local boids = World.Get("my other sea units from hell!")
 	for _,boid_other in ipairs(boids) do
 		if boid  ~= boid_other then
-			if GetDistance(boid:GetLatitude(), boid:GetLongitude(), boid_other:GetLatitude(), boid_other:GetLongitude()) < 3 then
+			if GetDistance(boid:GetLatitude(), boid:GetLongitude(), boid_other:GetLatitude(), boid_other:GetLongitude()) < distance then
 				lat = lat - (boid:GetLatitude() - boid_other:GetLatitude())
 				long = long - (boid:GetLongitude() - boid_other:GetLongitude())
 			end
 		end
 	end
 
-	return lat, long
-
+	return long, lat
 end
 
 function micro.boidGoal(boid)
+	if     boid:GetUnitType() == "Sub" then long, lat = World.GetNearestEnemyCoast(boid:GetLongitude(), boid:GetLatitude())
+	elseif boid:GetUnitType() == "Carrier" then long, lat = micro.boidFollow(boid, 1, "my subs")
+	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.boidFollow(boid, 1,"my carriers") end
+	return (long * .9) - boid:GetLongitude(), (lat * .9) - boid:GetLatitude()
+end
+--[[
+function micro.SubGoal(boid)
 	lat, long = World.GetNearestEnemyCoast(boid:GetLatitude(), boid:GetLongitude())
-	return (lat - boid:GetLatitude()), (long - boid:GetLongitude()) -- We'll try 50%
+	return (lat - boid:GetLatitude()), (long - boid:GetLongitude())
+end
+
+function micro.CarrierGoal(boid)
+	local lat = 0
+	local long = 0
+	local subs = World.Get("my subs")
+	for _,sub in ipairs(boids) do
+		if boid ~= sub then
+			lat = lat + sub:GetLatitude()
+			long = long + sub:GetLongitude()
+		end
+	end
+
+	lat = lat / # subs - 1
+	long = long / # subs - 1
+	return lat,long
+end
+
+function micro.BattleShipGoal(boid)
+		local lat = 0
+	local long = 0
+	local subs = World.Get("my subs")
+	for _,sub in ipairs(boids) do
+		if boid ~= sub then
+			lat = lat + sub:GetLatitude()
+			long = long + sub:GetLongitude()
+		end
+	end
+
+	lat = lat / # subs - 1
+	long = long / # subs - 1
+	return lat,long
 end
 
 function micro.boidGoal_crap(ship)
@@ -110,3 +153,4 @@ function micro.boidGoal_crap(ship)
 	return lat  * .5, long * .5
 end
 
+]]--

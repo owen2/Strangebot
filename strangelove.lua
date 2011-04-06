@@ -139,8 +139,8 @@ function strangelove.buildStuffRandom()
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Sub")
-				--PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
-				strangelove.buildFleet(long, lat,3, "Sub")
+				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+				--strangelove.buildFleet(long, lat,3, "Sub")
 		else
 			--strangelove.moveBoats()
 			placed= 1
