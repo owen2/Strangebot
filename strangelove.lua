@@ -154,9 +154,7 @@ function strangelove.nukepanic()
 			for _, silo in ipairs(silos) do
 				silo:SetState(0)
 					World.proxsort(targets, silo:GetLongitude(), silo:GetLatitude())
-					target = targets[j % # targets]
-					j=j+1
-					silo:SetActionTarget(target)
+						silo:SetActionTarget(targets[j%30])
 			end
 		else
 			DebugLog("Silo Flag not yet raised.")
