@@ -33,6 +33,7 @@ flag_subs_free = 1
 function OnInit()
 	SendChat("/name [BOT]Strangebot")
 	SendChat("Hi, I'm Owen's bot! See owenjohnson.info/cat/strangebot for more info.")
+	DebugLog("-179, 0 to 179, 0: "..GetDistance(-179, 0,179,0).." "..GetSailDistance(-179, 0,179,0))
 end
 
 -- Also required. 100ms execution time limit. Use it wisely.
@@ -48,7 +49,7 @@ function OnTick()
 		DefconLevel = GetDefconLevel()
 		if     (DefconLevel == 5) then RequestGameSpeed(20)
 		elseif (DefconLevel == 4) then
-		elseif (DefconLevel == 3) then
+		elseif (DefconLevel == 3) then micro.assertPersonality()
 		elseif (DefconLevel == 2) then
 		elseif (DefconLevel == 1) then
 		end
@@ -72,7 +73,7 @@ end
 
 -- Required function. fires whenever an event happens in the game.
 function OnEvent(eventType, sourceID, targetID, unitType, longitude, latitude)
-	DebugLog("eventType: "..eventType.." sourceID: "..sourceID.." unitType: "..unitType.." loc: "..longitude..", "..latitude)
+	--DebugLog("eventType: "..eventType.." sourceID: "..sourceID.." unitType: "..unitType.." loc: "..longitude..", "..latitude)
 	if (eventType == "CeasedFire") then
 		--A team ceased fire to another team.
 	elseif (eventType == "Destroyed") then
@@ -89,7 +90,7 @@ function OnEvent(eventType, sourceID, targetID, unitType, longitude, latitude)
 	elseif (eventType == "NukeLaunchSilo") then
 		--A missile has been launched from a silo at given coordinates.
 	elseif (eventType == "NukeLaunchSub") then
-		flag_silos_free = 1
+		--flag_silos_free = 1
 		--A missile has been launched from a sub at given coordinates.
 	elseif (eventType == "PingCarrier") then
 		--A sonar ping from a carrier has been detected (gives object id).

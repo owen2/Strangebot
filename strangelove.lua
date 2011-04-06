@@ -57,7 +57,7 @@ function strangelove.buildHiveByPopulationCenter()
 				baselong, baselat = World.GetOwnPopulationCenterDefensive()
 				radius = 10
 			else
-				baselong, baselat = World.GetOwnPopulationCenterDefensive()
+				baselong, baselat = World.GetOwnPopulationCenterAggressive()
 				radius = 5.1
 			end
 			Whiteboard.drawCircle(baselong, baselat, 5)
@@ -167,7 +167,7 @@ function strangelove.nukepanic()
 			if sub:GetNukeCount() > 0 then
 				clong, clat = sub:GetLongitude(), sub:GetLatitude()
 				tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
-				if GetDistance(clong, clat, tlong, tlat) < 20 then
+				if GetSailDistance(clong, clat, tlong, tlat) < 20 then
 					sub:SetState(2)
 					target = targets[j % # targets]
 					j=j+1
@@ -175,6 +175,7 @@ function strangelove.nukepanic()
 				end
 			else
 				sub:SetState(1)
+				flag_silos_free = 1
 			end
 		end
 		airbases = World.Get("my airbases with nukes")

@@ -38,7 +38,7 @@ function World.GetOwnPopulationCenterDefensive()
 	return (((longs / # cities) + cities[1]:GetLongitude())/2), (((lats / # cities) + cities[1]:GetLatitude())/2)
 end
 
-function World.GetOwnPopulationCenterAgressive() --returns the coordinates of the population center
+function World.GetOwnPopulationCenterAggressive() --returns the coordinates of the population center
 	local cities = World.GetOwnCities()
 	World.popsort(cities)
 	local longs = 0
@@ -165,25 +165,26 @@ end
 
 function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates.
 	bestlong, bestlat, bestdist = 500, 500, 3600
-	d = GetDistance(x,y, 22, 60)
+	d = GetSailDistance(x,y, 22, 60)
 	if d < bestdist and World.isEnemyTerritory("Europe") then bestlong, bestlat, bestdist = 22, 60, d end
-	d = GetDistance(x,y, -70, 37)
+	d = GetSailDistance(x,y, -70, 37)
 	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -70, 37, d end
-	d = GetDistance(x,y, -145, 40)
+	d = GetSailDistance(x,y, -145, 40)
 	if d < bestdist and World.isEnemyTerritory("NorthAmerica") then bestlong, bestlat, bestdist = -145, 40, d end
-	d = GetDistance(x,y, -100, 0)
+	d = GetSailDistance(x,y, -100, 0)
 	if d < bestdist and World.isEnemyTerritory("SouthAmerica") then bestlong, bestlat, bestdist = -100, 0, d end
-	d = GetDistance(x,y, -45, 15)
+	d = GetSailDistance(x,y, -45, 15)
 	if d < bestdist and World.isEnemyTerritory("SouthAmerica") then bestlong, bestlat, bestdist = -45, 15, d end
-	d = GetDistance(x,y, -10, -10)
+	d = GetSailDistance(x,y, -10, -10)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = -10, -10, d end
-	d = GetDistance(x,y, 60, 0)
+	d = GetSailDistance(x,y, 60, 0)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = 60, 0, d end
-	d = GetDistance(x,y, 85,0 )
+	d = GetSailDistance(x,y, 85,0 )
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 85, 0, d end
-	d = GetDistance(x,y, 133, 24)
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 133, 24, d end
-	d = GetDistance(x,y, 60, 85)
+	d = GetSailDistance(x,y, 133, 24)
+	if d < bestdist --and World.isEnemyTerritory("Asia")
+		then bestlong, bestlat, bestdist = 133, 24, d end
+	d = GetSailDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	--d = GetDistance(x,y, 175, 55)
 	--if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end

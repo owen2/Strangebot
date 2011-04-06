@@ -54,16 +54,17 @@ function micro.updateBoats()
 			--DebugLog(boid:GetStateTimer())
 			if boid:GetStateTimer() == 0 then -- only move if not doing anything useful.
 				long1, lat1 = micro.boidFollow(boid, .1, "my sea")
-				long2, lat2 = micro.boidSpacing(boid, 3)
+				long2, lat2 = micro.boidSpacing(boid, 6)
 				long3, lat3 = micro.boidGoal(boid)
 
 				lat = boid:GetLatitude() + lat1 + lat2 + lat3
 				long = boid:GetLongitude() + long1 + long2 + long3
 
-				boid:SetMovementTarget(long, lat)
-				if (not(IsSea(long, lat))) then
+				if IsSea(long, lat) then
+					boid:SetMovementTarget(long, lat)
+				else
 					DebugLog("Bad Sea Coordinate: "..long..","..lat)
-					boid:SetMovementTarget(long + math.random(0,10)-5, lat + math.random(0,10)-5)
+					boid:SetMovementTarget(long3, lat3)
 					--Whiteboard.DrawCross(long, lat, 1)
 				end
 			end
@@ -108,8 +109,8 @@ end
 function micro.boidGoal(boid)
 	if     boid:GetUnitType() == "Sub" then long, lat = micro.subGoal(boid)
 	elseif boid:GetUnitType() == "Carrier" then long, lat = micro.boidFollow(boid, 1, "my subs")
-	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.boidFollow(boid, 1,"my carriers") end
-	return (long * .9) - boid:GetLongitude(), (lat * .9) - boid:GetLatitude()
+	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.BattleShipGoal(boid) end
+	return (long) - boid:GetLongitude(), (lat) - boid:GetLatitude()
 end
 
 function micro.subGoal(sub)
@@ -117,5 +118,22 @@ function micro.subGoal(sub)
 		return World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude())
 	else
 		return micro.boidFollow(sub, 1,"hostile sea")
+	end
+end
+
+function micro.BattleShipGoal(ship)
+	if strangelove.personality == "aggressive" then
+		return micro.boidFollow(ship, 1,"my carriers")
+	else
+		return micro.boidFollow(ship, 1, "hostile sea")
+	end
+end
+
+function micro.assertPersonality()
+	if strangelove.personality == "defensive" then
+		local subs = World.Get("my sea")
+		for _,sub in ipairs(subs) do
+			sub:SetState(1)
+		end
 	end
 end
