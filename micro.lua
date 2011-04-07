@@ -125,7 +125,11 @@ function micro.BattleShipGoal(ship)
 	if strangelove.personality == "aggressive" then
 		return micro.boidFollow(ship, 1,"my carriers")
 	else
-		return micro.boidFollow(ship, 1, "hostile sea")
+		--return micro.boidFollow(ship, 1, "hostile sea")
+		local badships = World.Get("hostile sea")
+		World.proxsort(badships)
+		local target = badships[1]
+		return target:GetLongitude(), target:GetLatitude()
 	end
 end
 

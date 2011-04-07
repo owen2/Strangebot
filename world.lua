@@ -80,7 +80,7 @@ end
 
 function World.isFriendlyTerritory(ter)
 	team = World.whoIs(ter)
-	return World.isFriendlyTeam(team) or team == false -- Return true if territory is filled by ally or is empty
+	return World.isFriendlyTeam(team)
 end
 
 function World.isEnemyTerritory(ter)
@@ -182,8 +182,7 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	d = GetSailDistance(x,y, 85,0 )
 	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 85, 0, d end
 	d = GetSailDistance(x,y, 133, 24)
-	if d < bestdist --and World.isEnemyTerritory("Asia")
-		then bestlong, bestlat, bestdist = 133, 24, d end
+	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 133, 24, d end
 	d = GetSailDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	--d = GetDistance(x,y, 175, 55)
