@@ -178,14 +178,15 @@ function strangelove.fillNukeQueue()
 end
 
 function strangelove.nukepanic()
-	if GetGameTick() % 10 == 0 and flag_silos_free == 1 then
-		silos = World.Get("my silos with nukes")
-		for _, silo in ipairs(silos) do
-			silo:SetState(0)
-			    if strangelove.nukequeue.isEmpty() then strangelove.fillNukeQueue() end
-				silo:SetActionTarget(strangelove.nukequeue.dequeue())
-		end
-
+	if GetGameTick() % 10 == 0 then
+	    if strangelove.siloLaunchCondition() then
+		    silos = World.Get("my silos with nukes")
+		    for _, silo in ipairs(silos) do
+			    silo:SetState(0)
+			        if strangelove.nukequeue.isEmpty() then strangelove.fillNukeQueue() end
+				    silo:SetActionTarget(strangelove.nukequeue.dequeue())
+		    end
+        end
 		subs = World.Get("my subs")
 		for _, sub in ipairs(subs) do
 			if sub:GetNukeCount() > 0 then
@@ -230,7 +231,7 @@ function strangelove.nukepanic()
 	end
 end
 
-function strangelove.siloLaunchCondition(silo)
+function strangelove.siloLaunchCondition()
     return flag_silos_free == 1
 end
 

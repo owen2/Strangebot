@@ -181,8 +181,6 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	if d < bestdist and World.isEnemyTerritory("SouthAsia") then bestlong, bestlat, bestdist = 133, 24, d end
 	d = GetSailDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
-	--d = GetDistance(x,y, 175, 55)
-	--if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 175, 55, d end
 	return bestlong, bestlat
 
 end
@@ -336,11 +334,11 @@ end
 function World.GetInRangeOf(query, unit)
     local targs = World.Get(query)
     local inrange = {}
-    for i, targ in ipairs() do
+    for i, targ in ipairs(targs) do
         if GetDistance(targ:GetLongitude(), targ:GetLatitude(), unit:GetLongitude(), unit:GetLatitude()) < unit:GetRange() then
             table.insert(targs[i])
         end
     end
-    return inrange()
+    return inrange
 end
         
