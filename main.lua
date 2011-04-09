@@ -3,7 +3,7 @@
 -- A lua based agent for Defcon						-
 -- by Owen Johnson									-
 -- owen@owenjohnson.info							'--------------------
--- latest version at http://github.com/owen2/Strangebot/zipball/master	-
+-- latest version at http://github.com/owen2/Strangebot/zipball/master 	-
 -- This is the skeleton that glues the project up.	,--------------------
 -----------------------------------------------------
 
@@ -17,6 +17,7 @@ require "world" -- A perception model for the world to get info from
 require "strangelove" -- The higher level strategy code for the AI
 require "Multithreading" -- A coroutine queuing library
 require "micro" -- Micro level/event handling
+require "Queue"
 
 
 ---------------------------------
@@ -24,10 +25,11 @@ require "micro" -- Micro level/event handling
 ---------------------------------
 if GetOptionValue("ScoreMode") == 1 then strangelove.personality = "defensive" else strangelove.personality = "aggressive" end
 DefconLevel = 0 -- the stage of the game
-j = 0 -- a global index for next target in target list TODO: Global Launch queuing this is really a hack
+j = 1 -- a global index for next target in target list TODO: Global Launch queuing this is really a hack
 flag_placed = 0 -- Whether or not all units have been placed. (keeps spawning routine from running) Saves lots of computation
-flag_silos_free = 0
+flag_silos_free = 1
 flag_subs_free = 1
+navy_build_queue = Queue.new() -- I'm using this queue to build individual ships. Ships built in the same tick are put together in a fleet, which is not what I want
 
 -- Required by luabot binding. Fires when the agent is selected.
 function OnInit()
@@ -47,7 +49,7 @@ function OnTick()
 	---------------------------------------------------------
 	if (DefconLevel ~= GetDefconLevel()) then
 		DefconLevel = GetDefconLevel()
-		if     (DefconLevel == 5) then RequestGameSpeed(20)
+		if     (DefconLevel == 5) then 
 		elseif (DefconLevel == 4) then
 		elseif (DefconLevel == 3) then micro.assertPersonality()
 		elseif (DefconLevel == 2) then
@@ -65,7 +67,7 @@ function OnTick()
 	end
 	Resume(.05) -- Wake up threads (if any)
 	micro.updateBoats()
-
+	strangelove.buildonce()
 	DebugLog(string.format("tick load: %3.0f%%", (os.clock() - x)*1000))
 
 

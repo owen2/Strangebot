@@ -76,11 +76,23 @@ function strangelove.buildFleet(x, y, radius, unitType)
 		for i = 0, 6 do
 			local nx = cos1 * dx - sin1 * dy
 			local ny = sin1 * dx + cos1 * dy
-			PlaceFleet(x+nx, y+ny, unitType)
+			--PlaceFleet(x+nx, y+ny, unitType)
+            local ship = {}
+            ship.boattype = unitType
+            ship.long = x+nx
+            ship.lat  = y+ny
+            navy_build_queue.enqueue(ship)
 			--Wait(true)
 			dx, dy = nx, ny
 		end
 	--end)
+end
+
+function strangelove.buildonce()
+    if not navy_build_queue.isEmpty() then
+        local ship = navy_build_queue.dequeue()
+        PlaceFleet(ship.long, ship.lat, ship.boattype)
+    end
 end
 
 function strangelove.buildRing(x, y, radius, unitType)
@@ -126,22 +138,23 @@ function strangelove.buildStuffRandom()
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "BattleShip")
-				PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
-				--strangelove.buildFleet(long, lat, 3, "BattleShip")
+				--PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
+				strangelove.buildFleet(long, lat, 5, "BattleShip")
 		elseif GetRemainingUnits("Carrier") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Carrier")
-				PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
-				--strangelove.buildFleet(long, lat,3 ,  "Carrier")
+				--PlaceFleet(long, lat, "Carrier", "Carrier", "Carrier", "Carrier", "Carrier", "Carrier")
+				strangelove.buildFleet(long, lat,5 ,  "Carrier")
 		elseif GetRemainingUnits("Sub") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "Sub")
-				PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
-				--strangelove.buildFleet(long, lat,3, "Sub")
+				--PlaceFleet(long, lat, "Sub", "Sub", "Sub", "Sub", "Sub", "Sub")
+				strangelove.buildFleet(long, lat,5, "Sub")
 		else
-			flag_placed= 1
+			flag_placed = 1
+			RequestGameSpeed(20)
 		end
 	end
 end
