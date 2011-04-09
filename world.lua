@@ -324,9 +324,12 @@ end
 
 function World.GetNearest(query, long, lat)
     local targs = World.Get(query)
-    World.proxsort(targs, long, lat)
-    local target = targs[1]
-    return target:GetLongitude(), target:GetLatitude()
+    if # targs > 0 then
+        World.proxsort(targs, long, lat)
+        local target = targs[1]
+        return target:GetLongitude(), target:GetLatitude()
+    else
+        return long, lat
 end
 
 

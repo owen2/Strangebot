@@ -49,8 +49,8 @@ function OnTick()
 	---------------------------------------------------------
 	if (DefconLevel ~= GetDefconLevel()) then
 		DefconLevel = GetDefconLevel()
-		if     (DefconLevel == 5) then 
-		elseif (DefconLevel == 4) then
+		if     (DefconLevel == 5) then strangelove.buildHiveByPopulationCenter()
+		elseif (DefconLevel == 4) then 
 		elseif (DefconLevel == 3) then micro.assertPersonality()
 		elseif (DefconLevel == 2) then
 		elseif (DefconLevel == 1) then
@@ -59,7 +59,7 @@ function OnTick()
 		-------------------------------------
 		-- Stuff that happens every tick.	-
 		-------------------------------------
-		if (DefconLevel == 5) then strangelove.buildHiveByPopulationCenter() strangelove.buildBoats() end
+		if (DefconLevel == 5) then strangelove.buildBoats() end
 		if (DefconLevel == 4) then strangelove.buildStuffRandom() end --in case we forgot something
 		if (DefconLevel == 3) then end
 		if (DefconLevel == 2) then micro.airbaseScout() end

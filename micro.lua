@@ -135,9 +135,9 @@ end
 
 function micro.assertPersonality()
 	if strangelove.personality == "defensive" then
-		local subs = World.Get("my sea")
-		for _,sub in ipairs(subs) do
-			sub:SetState(1)
+		local ships = World.Get("my sea")
+		for _,ship in ipairs(ships) do
+			ship:SetState(1)
 		end
 	end
 end
