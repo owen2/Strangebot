@@ -329,7 +329,7 @@ function World.GetNearest(query, long, lat)
         local target = targs[1]
         return target:GetLongitude(), target:GetLatitude()
     else
-        return long, lat
+        return World.GetNearest("sea",long, lat)
+    end
 end
-
 

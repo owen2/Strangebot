@@ -13,6 +13,8 @@ strangelove = {}
 strangelove.personality = "aggressive" -- just for default's sake
 -- OR -- ( "aggressive" | "defensive" | "reactive" )
 
+strangelove.nukequeue = Queue.new()
+
 function strangelove.makeFriends()
 	RequestAlliance(GetAllianceID(strangelove.getBestAlly()))
 end
@@ -139,7 +141,9 @@ function strangelove.buildStuffRandom()
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
 			until IsValidPlacementLocation(long, lat, "BattleShip")
 				--PlaceFleet(long, lat, "BattleShip", "BattleShip", "BattleShip", "BattleShip","BattleShip", "BattleShip")
-				strangelove.buildFleet(long, lat, 5, "BattleShip")
+				strangelove.buildFleet(long, lat,5, "BattleShip")
+				strangelove.buildFleet(long, lat,7, "Sub")
+				strangelove.buildFleet(long, lat,3, "Carrier")
 		elseif GetRemainingUnits("Carrier") > 0 then
 			repeat
 				lat, long = math.random() * 360 - 180, math.random() * 360 - 180
@@ -166,8 +170,8 @@ function strangelove.nukepanic()
 			silos = World.Get("my silos with nukes")
 			for _, silo in ipairs(silos) do
 				silo:SetState(0)
-					World.proxsort(targets, silo:GetLongitude(), silo:GetLatitude())
-					silo:SetActionTarget(targets[j%30])
+					World.popsort(targets, silo:GetLongitude(), silo:GetLatitude())
+					silo:SetActionTarget(targets[j%20])
 			end
 		else
 			DebugLog("Silo Flag not yet raised.")

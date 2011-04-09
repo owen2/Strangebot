@@ -22,7 +22,7 @@ function micro.airbaseDefensive()
 end
 
 function micro.airbaseScout()
-	if GetGameTick() % 50 == 0 then
+	if GetGameTick() % 51 == 0 then
 		local bases = World.Get("my airbases")
 		local spots = World.GetTargetCities()
 
@@ -48,13 +48,13 @@ function micro.subBail(sub)
 end
 
 function micro.updateBoats()
-	if GetGameTick() % 50  == 0 and flag_placed == 1 then
+	if GetGameTick() % 100  == 0 and flag_placed == 1 then
 		boids = World.Get("my sea")
 		for _,boid in ipairs(boids) do
 			--DebugLog(boid:GetStateTimer())
 			if boid:GetStateTimer() == 0 then -- only move if not doing anything useful.
-				long1, lat1 = micro.boidFollow(boid, .1, "my sea")
-				long2, lat2 = micro.boidSpacing(boid, 6)
+				long1, lat1 = 0,0--micro.boidFollow(boid, .1, "my sea")
+				long2, lat2 = micro.boidSpacing(boid, 3)
 				long3, lat3 = micro.boidGoal(boid)
 
 				lat = boid:GetLatitude() + lat1 + lat2 + lat3
@@ -130,7 +130,7 @@ function micro.BattleShipGoal(ship)
 end
 
 function micro.CarrierGoal(carrier)
-	return World.GetNearest("my battleships", carrier:GetLongitude(), carrier:GetLatitude())
+	return World.GetNearest("my battleship", carrier:GetLongitude(), carrier:GetLatitude())
 end
 
 function micro.assertPersonality()
