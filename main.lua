@@ -14,7 +14,7 @@
 package.path = debug.getinfo(1, "S").source:match[[^@?(.*[\/])[^\/]-$]] .."?.lua;".. package.path
 require "Queue"
 require "Whiteboard" -- A library for easier Whiteboard drawing
-require "Multithreading" -- A coroutine queuing library
+--require "Multithreading" -- A coroutine queuing library
 require "world" -- A perception model for the world to get info from
 require "strangelove" -- The higher level strategy code for the AI
 require "micro" -- Micro level/event handling
@@ -65,7 +65,7 @@ function OnTick()
 		elseif (DefconLevel == 2) then micro.airbaseScout() 
 		else strangelove.nukepanic() end
 	end
-	Resume(.05) -- Wake up threads (if any)
+	--Resume(.05) -- Wake up threads (if any)
 	micro.updateBoats()
 	strangelove.buildonce()
 	DebugLog(string.format("tick load: %3.0f%%", (os.clock() - x)*1000))

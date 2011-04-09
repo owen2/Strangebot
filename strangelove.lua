@@ -5,7 +5,6 @@
 -- http://owenjohnson.info/cat/strangebot
 --										---------------------------------------------
 -- This contains all of the high level strategy for the agent. It's fancy....		-
--- uses martin's coroutine wrapper. Thanks! see Multithreading.lua for more details	-
 -------------------------------------------------------------------------------------
 
 strangelove = {}
@@ -163,32 +162,49 @@ function strangelove.buildStuffRandom()
 	end
 end
 
+function strangelove.fillNukeQueue()
+    local infrastructure = World.Get("hostile land")
+    local long, lat = World.GetOwnPopulationCenterAggressive()
+    World.proxsort(infrastructure, long, lat)
+    for _, unit in ipairs(infrastructure) do
+        strangelove.nukequeue.enqueue(unit)
+        strangelove.nukequeue.enqueue(unit) -- i want it in there twice, not a typo
+    end
+    local targets = World.GetTargetCities()
+    World.proxsort(targets, long, lat)
+    for _, unit in ipairs(targets) do
+        strangelove.nukequeue.enqueue(unit)
+    end
+end
+
 function strangelove.nukepanic()
-	local targets = World.GetTargetCities()
-	if GetGameTick() % 10 == 0 then
-		if flag_silos_free == 1 then
-			silos = World.Get("my silos with nukes")
-			for _, silo in ipairs(silos) do
-				silo:SetState(0)
-					World.popsort(targets, silo:GetLongitude(), silo:GetLatitude())
-					silo:SetActionTarget(targets[j%20])
-			end
-		else
-			DebugLog("Silo Flag not yet raised.")
+	if GetGameTick() % 10 == 0 and flag_silos_free == 1 then
+		silos = World.Get("my silos with nukes")
+		for _, silo in ipairs(silos) do
+			silo:SetState(0)
+			    if strangelove.nukequeue.isEmpty() then strangelove.fillNukeQueue() end
+				silo:SetActionTarget(strangelove.nukequeue.dequeue())
 		end
 
 		subs = World.Get("my subs")
 		for _, sub in ipairs(subs) do
 			if sub:GetNukeCount() > 0 then
-				clong, clat = sub:GetLongitude(), sub:GetLatitude()
-				tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
-				if GetSailDistance(clong, clat, tlong, tlat) < 20 then
-					sub:SetState(2)
-					target = targets[j % # targets]
-					j=j+1
-					sub:SetActionTarget(target)
+				--clong, clat = sub:GetLongitude(), sub:GetLatitude()
+				--tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
+				--if GetSailDistance(clong, clat, tlong, tlat) < 20 then
+                if strangelove.subLaunchCondition(sub) then
+				    local subtargets = World.GetInRangeOf("hostile cities")
+				    World.popsort(subtargets)
+				    for _, target in ipairs(subtargets) do
+				        sub:SetState(2)
+				        sub:SetActionTarget(target)
+				    end
 				end
-			else
+				--target = targets[j % # targets]
+				--j=j+1
+				--sub:SetActionTarget(target)
+				--end
+		    else
 				sub:SetState(1)
 				flag_silos_free = 1
 			end
@@ -212,4 +228,12 @@ function strangelove.nukepanic()
 			base:SetActionTarget(target)
 		end
 	end
+end
+
+function strangelove.siloLaunchCondition(silo)
+    return flag_silos_free == 1
+end
+
+function strangelove.subLaunchCondition(sub)
+    return flag_subs_free == 1
 end

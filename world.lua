@@ -132,11 +132,11 @@ function World.isAdjacentTerritory(ter1, ter2)
 		return (ter2 == ("Russia" or ter2 == "Africa"))
 	elseif (ter1 == "Russia")
 	then
-		return (ter2 == ("Europe" or ter2 == "Asia"))
+		return (ter2 == ("Europe" or ter2 == "SouthAsia"))
 	elseif (ter1 == "Africa")
 	then
-		return (ter2 == ("Europe" or ter2 == "Asia"))
-	elseif (ter1 == "Asia")
+		return (ter2 == ("Europe" or ter2 == "SouthAsia"))
+	elseif (ter1 == "SouthAsia")
 	then
 		return (ter2 == ("Russia" or ter2 == "Africa"))
 	elseif (ter1 == "NorthAmerica")
@@ -176,9 +176,9 @@ function World.GetNearestEnemyCoast(x,y) -- TODO: Don't hardcode sea coordinates
 	d = GetSailDistance(x,y, 60, 0)
 	if d < bestdist and World.isEnemyTerritory("Africa") then bestlong, bestlat, bestdist = 60, 0, d end
 	d = GetSailDistance(x,y, 85,0 )
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 85, 0, d end
+	if d < bestdist and World.isEnemyTerritory("SouthAsia") then bestlong, bestlat, bestdist = 85, 0, d end
 	d = GetSailDistance(x,y, 133, 24)
-	if d < bestdist and World.isEnemyTerritory("Asia") then bestlong, bestlat, bestdist = 133, 24, d end
+	if d < bestdist and World.isEnemyTerritory("SouthAsia") then bestlong, bestlat, bestdist = 133, 24, d end
 	d = GetSailDistance(x,y, 60, 85)
 	if d < bestdist and World.isEnemyTerritory("Russia") then bestlong, bestlat, bestdist = 60, 85, d end
 	--d = GetDistance(x,y, 175, 55)
@@ -333,3 +333,14 @@ function World.GetNearest(query, long, lat)
     end
 end
 
+function World.GetInRangeOf(query, unit)
+    local targs = World.Get(query)
+    local inrange = {}
+    for i, targ in ipairs() do
+        if GetDistance(targ:GetLongitude(), targ:GetLatitude(), unit:GetLongitude(), unit:GetLatitude()) < unit:GetRange() then
+            table.insert(targs[i])
+        end
+    end
+    return inrange()
+end
+        

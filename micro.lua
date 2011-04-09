@@ -123,14 +123,14 @@ end
 
 function micro.BattleShipGoal(ship)
 	if strangelove.personality == "aggressive" then
-		return World.GetNearest("my sub", ship:GetLongitude(), ship:GetLatitude())
+		return World.GetNearest("hostile sea", ship:GetLongitude(), ship:GetLatitude())
 	else
-        return World.GetNearest("hostile sea", ship:GetLongitude(), ship:GetLatitude())
+        return World.GetNearest("my subs", ship:GetLongitude(), ship:GetLatitude())
 	end
 end
 
 function micro.CarrierGoal(carrier)
-	return World.GetNearest("my battleship", carrier:GetLongitude(), carrier:GetLatitude())
+	return World.GetNearest("my subs", carrier:GetLongitude(), carrier:GetLatitude())
 end
 
 function micro.assertPersonality()
