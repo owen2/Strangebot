@@ -93,7 +93,7 @@ function micro.boidSpacing(boid, distance)
 
 	local lat = 0
 	local long = 0
-	local boids = World.Get("my other sea units from hell!")
+	local boids = World.Get("my sea")
 	for _,boid_other in ipairs(boids) do
 		if boid  ~= boid_other then
 			if GetDistance(boid:GetLatitude(), boid:GetLongitude(), boid_other:GetLatitude(), boid_other:GetLongitude()) < distance then
@@ -108,29 +108,29 @@ end
 
 function micro.boidGoal(boid)
 	if     boid:GetUnitType() == "Sub" then long, lat = micro.subGoal(boid)
-	elseif boid:GetUnitType() == "Carrier" then long, lat = micro.boidFollow(boid, 1, "my subs")
+	elseif boid:GetUnitType() == "Carrier" then long, lat = micro.CarrierGoal(boid)--micro.boidFollow(boid, 1, "my subs")
 	elseif boid:GetUnitType() == "BattleShip" then long, lat = micro.BattleShipGoal(boid) end
 	return (long) - boid:GetLongitude(), (lat) - boid:GetLatitude()
 end
 
 function micro.subGoal(sub)
 	if sub:GetNukeCount() > 0 then
-		return World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude())
+		return World.GetNearestEnemyCoast(sub:GetLongitude(), sub:GetLatitude()) -- TODO! NEED A BETTER ATTACK POINT!!
 	else
-		return micro.boidFollow(sub, 1,"hostile sea")
+		return World.GetNearest("hostile sea", sub:GetLongitude(), sub:GetLatitude())
 	end
 end
 
 function micro.BattleShipGoal(ship)
 	if strangelove.personality == "aggressive" then
-		return micro.boidFollow(ship, 1,"my carriers")
+		return World.GetNearest("my sub", ship:GetLongitude(), ship:GetLatitude())
 	else
-		--return micro.boidFollow(ship, 1, "hostile sea")
-		local badships = World.Get("hostile sea")
-		World.proxsort(badships)
-		local target = badships[1]
-		return target:GetLongitude(), target:GetLatitude()
+        return World.GetNearest("hostile sea", ship:GetLongitude(), ship:GetLatitude())
 	end
+end
+
+function micro.CarrierGoal(carrier)
+	return World.GetNearest("my battleships", carrier:GetLongitude(), carrier:GetLatitude())
 end
 
 function micro.assertPersonality()

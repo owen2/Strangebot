@@ -1,7 +1,7 @@
 ---------------------------------------------
 -- Dr. Strangebot World Perception Layer	-
 -- by Owen Johnson							-
--- http://owenjohnson.info/dev/defcon		-
+-- http://owenjohnson.info/cat/defcon       -
 --											-----------------------------
 -- Holds data about the world including cities, players, allies, etc.	-
 -------------------------------------------------------------------------
@@ -18,10 +18,6 @@ function World.GetOwnCities()
 		end
 	end
 	return myCities
-end
-
-function World.GetTargets()
-
 end
 
 function World.GetOwnPopulationCenterDefensive()
@@ -198,9 +194,9 @@ end
 --  Takes a single string as an argument to combine team, type, and	 )
 -- 		nuclear capacity into a neat filtered list of your units.	/
 --------------------------------------------------------------------
+--usage: World.Get("(all|my|hostile) ((land|sea|planes)|(airbase|silo|radar|city|cities|battleship|carrier|sub|fighter|bomber|missile)) [with nukes|empty]")
 
-
-function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
+function World.Get(query)
 	local units = {}
 	-- first, filter by team status. One of all, own, friendly, or enemy should be included.
 	if string.match(query, "my") then
@@ -221,11 +217,7 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 		units = GetAllUnits()
 	end
 
-	if string.match(query, "fleet") then -- you can only see your own fleets anyway.
-		units = GetOwnFleets()
-	end
-
-	-- filter by unit type land, sea, air, Silo, AirBase, RadarStation, BattleShip, Carrier, Sub, Fighter, Bomber, Nuke -- only one of these should be used.
+	-- filter by unit type land, sea, air, Silo, AirBase, RadarStation, BattleShip, Carrier, Sub, Fighter, Bomber, missile -- only one of these should be used.
 	if string.match(query, "land") then
 		landunits = {}
 		for i, unit in ipairs(units) do
@@ -329,3 +321,12 @@ function World.Get(query) -- usage: World.Get("enemy sea units withNukes ")
 	--done filtering, send result
 	return units
 end
+
+function World.GetNearest(query, long, lat)
+    local targs = World.Get(query)
+    World.proxsort(targs, long, lat)
+    local target = targs[1]
+    return target:GetLongitude(), target:GetLatitude()
+end
+
+
