@@ -336,7 +336,7 @@ function World.GetInRangeOf(query, unit)
     local inrange = {}
     for i, targ in ipairs(targs) do
         if GetDistance(targ:GetLongitude(), targ:GetLatitude(), unit:GetLongitude(), unit:GetLatitude()) < unit:GetRange() then
-            table.insert(targs[i])
+            table.insert(inrange,targs[i])
         end
     end
     return inrange

@@ -195,10 +195,13 @@ function strangelove.nukepanic()
 				--if GetSailDistance(clong, clat, tlong, tlat) < 20 then
                 if strangelove.subLaunchCondition(sub) then
 				    local subtargets = World.GetInRangeOf("hostile cities")
+                    DebugLog("Number of sub targets in range: ".. # subtargets)
 				    World.popsort(subtargets)
-				    for _, target in ipairs(subtargets) do
+				    for i = 1,6 do
+                        local target = subtargets[i]
 				        sub:SetState(2)
 				        sub:SetActionTarget(target)
+				        DebugLog("Setting sub target: "..long..", "..lat)
 				    end
 				end
 				--target = targets[j % # targets]
@@ -236,5 +239,6 @@ function strangelove.siloLaunchCondition()
 end
 
 function strangelove.subLaunchCondition(sub)
-    return flag_subs_free == 1
+    DebugLog("Subconditions: "..# World.GetInRangeOf("hostile cities",sub).."/6, "..# World.GetInRangeOf("hostile sea",sub).."/0, "..# World.GetInRangeOf("my subs",sub).."/1")
+    return # World.GetInRangeOf("hostile cities",sub) >= 6 and # World.GetInRangeOf("hostile sea",sub) == 0 and # World.GetInRangeOf("my subs",sub) > 0
 end
