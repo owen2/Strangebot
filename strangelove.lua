@@ -168,7 +168,7 @@ function strangelove.fillNukeQueue()
     World.proxsort(infrastructure, long, lat)
     for _, unit in ipairs(infrastructure) do
         strangelove.nukequeue.enqueue(unit)
-        strangelove.nukequeue.enqueue(unit) -- i want it in there twice, not a typo
+        --strangelove.nukequeue.enqueue(unit) -- i want it in there twice, not a typo
     end
     local targets = World.GetTargetCities()
     World.proxsort(targets, long, lat)
@@ -194,7 +194,7 @@ function strangelove.nukepanic()
 				--tlong, tlat = World.GetNearestEnemyCoast(clong, clat) --TODO! THIS SUCKS! NEED NEW ALG
 				--if GetSailDistance(clong, clat, tlong, tlat) < 20 then
                 if strangelove.subLaunchCondition(sub) then
-				    local subtargets = World.GetInRangeOf("hostile cities")
+				    local subtargets = World.GetInRangeOf("hostile cities", sub, 50)
                     DebugLog("Number of sub targets in range: ".. # subtargets)
 				    World.popsort(subtargets)
 				    for i = 1,6 do
@@ -226,6 +226,7 @@ function strangelove.nukepanic()
 		airbases = World.Get("my carriers with nukes")
 		for _,base in ipairs(airbases) do
 			World.proxsort(targets, base:GetLongitude(), base:GetLatitude())
+
 			base:SetState(1)
 			target = targets[j % # targets]
 			j=j+1
@@ -239,6 +240,6 @@ function strangelove.siloLaunchCondition()
 end
 
 function strangelove.subLaunchCondition(sub)
-    DebugLog("Subconditions: "..# World.GetInRangeOf("hostile cities",sub).."/6, "..# World.GetInRangeOf("hostile sea",sub).."/0, "..# World.GetInRangeOf("my subs",sub).."/1")
-    return # World.GetInRangeOf("hostile cities",sub) >= 6 and # World.GetInRangeOf("hostile sea",sub) == 0 and # World.GetInRangeOf("my subs",sub) > 0
+    DebugLog("Subconditions: "..# World.GetInRangeOf("hostile cities",sub, 50).."/6, "..# World.GetInRangeOf("hostile sea",sub, 15).."/0, "..# World.GetInRangeOf("my subs",sub, 10).."/1")
+    return # World.GetInRangeOf("hostile cities",sub, 50) >= 6 and # World.GetInRangeOf("my subs",sub, 10) > 0 and # World.GetInRangeOf("hostile sea",sub, 15) == 0
 end

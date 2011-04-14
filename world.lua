@@ -295,11 +295,17 @@ function World.Get(query)
 		end
 		units= typeunit
 	elseif string.match(query, "cit") then
-		typeunit = {}
-		for _, unit in ipairs(units) do
-			if unit:GetUnitType() == "City" then table.insert(typeunit, unit) end
-		end
-		units = typeunit
+	    allCities= GetCityIDs()
+	    hometeam = GetOwnTeamID()
+	    friendly = GetAllianceID(hometeam)
+	    badCities = {}
+	    for i, city in ipairs(allCities) do
+		    cityTeam = GetTeamID(city)
+		    if (hometeam ~= cityTeam and friendly ~= GetAllianceID(cityTeam)) then -- it's not ours, it's not our friend's, LET'S NUKE IT!
+			    table.insert(badCities, city)
+		    end
+	    end
+		units = badCities
 	end
 	-- filter "with nukes"
 	if string.match(query, "with nukes") then
@@ -331,11 +337,11 @@ function World.GetNearest(query, long, lat)
     end
 end
 
-function World.GetInRangeOf(query, unit)
+function World.GetInRangeOf(query, unit, dist)
     local targs = World.Get(query)
     local inrange = {}
     for i, targ in ipairs(targs) do
-        if GetDistance(targ:GetLongitude(), targ:GetLatitude(), unit:GetLongitude(), unit:GetLatitude()) < unit:GetRange() then
+        if GetDistance(targ:GetLongitude(), targ:GetLatitude(), unit:GetLongitude(), unit:GetLatitude()) < dist then--unit:GetRange() then -- GetRange not working??
             table.insert(inrange,targs[i])
         end
     end
