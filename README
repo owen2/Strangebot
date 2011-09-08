@@ -6,6 +6,4 @@ This is an AI agent to play the commercial game DEFCON, a nuclear warfare simula
 
 You need to rename the folder these files are in to `strangebot` and place it in the AI folder of defcon. Then load the bot enabled version of the game to load it as a player.
 
-Uses Martin's multithreadding and someone's whiteboard library
-
 License: cc-by-nc
